@@ -6,7 +6,7 @@ namespace Calibrator.Tests
 
         public void ApproximatesValuesCorrectly(Dictionary<Experiment, double> expected, SensorChannel channel)
         {
-            Approximator.Aproximate(channel);
+            Approximator.AproximateResults(channel);
 
             Assert.Equal(expected, channel.Results);
         }

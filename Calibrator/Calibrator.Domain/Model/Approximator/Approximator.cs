@@ -9,7 +9,7 @@ public static class Approximator
 
     }
 
-    public static void Aproximate(Report.SensorChannel channel)
+    public static void AproximateResults(Report.SensorChannel channel)
     {
         
     }
