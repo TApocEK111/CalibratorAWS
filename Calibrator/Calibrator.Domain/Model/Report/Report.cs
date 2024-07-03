@@ -1,6 +1,6 @@
 ﻿namespace Calibrator.Domain.Model.Report;
 
-internal class Report
+public class Report
 {
     public string Operator { get; set; }
     public DateTime Date { get; set; }

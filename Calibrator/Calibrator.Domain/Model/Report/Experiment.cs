@@ -1,6 +1,6 @@
 ﻿namespace Calibrator.Domain.Model.Report;
 
-internal class Experiment
+public class Experiment
 {
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
