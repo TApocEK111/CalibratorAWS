@@ -33,7 +33,7 @@ public static class Matrix
         }
         return sum;
     }
-    public static double[] GetCoeffitients(Report.Channel channel)
+    public static double[] GetCoeffitients(Report.SensorChannel channel)
     {
         double[] X = new double[channel.Parameters.Count];
         double[] Y = new double[channel.Parameters.Count];

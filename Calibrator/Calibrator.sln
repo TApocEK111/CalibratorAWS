@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calibrator.Domain", "Calibr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calibrator.Infrastructure", "Calibrator.Infrastructure\Calibrator.Infrastructure.csproj", "{6856E9E5-B1A1-42B6-B4D1-16C62B6AB3C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calibrator.Tests", "Calibrator.Tests\Calibrator.Tests.csproj", "{735A09C9-813B-4B29-B4AE-50CF88D7267E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calibrator.Tests", "Calibrator.Tests\Calibrator.Tests.csproj", "{B72A3F32-245B-4DFF-89C9-8657C49B9658}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{6856E9E5-B1A1-42B6-B4D1-16C62B6AB3C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6856E9E5-B1A1-42B6-B4D1-16C62B6AB3C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6856E9E5-B1A1-42B6-B4D1-16C62B6AB3C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{735A09C9-813B-4B29-B4AE-50CF88D7267E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{735A09C9-813B-4B29-B4AE-50CF88D7267E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{735A09C9-813B-4B29-B4AE-50CF88D7267E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{735A09C9-813B-4B29-B4AE-50CF88D7267E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72A3F32-245B-4DFF-89C9-8657C49B9658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72A3F32-245B-4DFF-89C9-8657C49B9658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72A3F32-245B-4DFF-89C9-8657C49B9658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72A3F32-245B-4DFF-89C9-8657C49B9658}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

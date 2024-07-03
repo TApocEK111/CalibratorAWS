@@ -2,10 +2,13 @@ namespace Calibrator.Tests
 {
     public class ApproximatorTests
     {
-        [Fact]
-        public void Test1()
-        {
+        [Theory]
 
+        public void ApproximatesValuesCorrectly(Dictionary<Experiment, double> expected, SensorChannel channel)
+        {
+            Approximator.Aproximate(channel);
+
+            Assert.Equal(expected, channel.Results);
         }
     }
 }

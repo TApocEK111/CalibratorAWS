@@ -4,13 +4,13 @@ public static class Approximator
 {
     static double[] coefficients;
 
-    public static Approximator()
+    static Approximator()
     {
 
     }
 
-    public static void Aproximate(Report.Channel channel)
+    public static void Aproximate(Report.SensorChannel channel)
     {
-       
+        
     }
 }
