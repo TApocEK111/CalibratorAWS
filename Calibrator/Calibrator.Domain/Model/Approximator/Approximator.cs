@@ -15,7 +15,7 @@ public static class Approximator
 
     public static void CalculateResults(SensorChannel channel)
     {
-        var results = new Dictionary<Experiment, double>();
+        var results = new Dictionary<Entry, double>();
         foreach (var parameter in channel.Parameters)
         {
             results.Add(parameter.Key, Aproximate(parameter.Value));

@@ -70,9 +70,22 @@ public static class Matrix
             m[j] = t;
         }
 
-        double[][] ma = m;
-        double[][] mb = m;
-        double[][] mc = m;
+        double[][] ma = new double[3][];
+        double[][] mb = new double[3][];
+        double[][] mc = new double[3][];
+
+        for (int j = 0; j < 3; j++)
+        {
+            double[] t = new double[3];
+            for (int k = 0; k < 3; k++)
+            {
+                t[k] = m[j][k];
+            }
+            ma[j] = t;
+            mb[j] = t;
+            mc[j] = t;
+        }
+
 
         for (int j = 0; j < 3; j++)
         {
@@ -93,6 +106,10 @@ public static class Matrix
             }
         }
         double deltaM = GetDeterminant(m);
+        if (deltaM == 0)
+        {
+            throw new Exception("Sensor is kal");
+        }
         double[] result = [GetDeterminant(ma) / deltaM, GetDeterminant(mb) / deltaM, GetDeterminant(mc) / deltaM];
         return result;
     }

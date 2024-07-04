@@ -1,7 +1,7 @@
 ﻿namespace Calibrator.Domain.Model.Report;
 
-public class SensorChannel
+public class ExternalImpact
 {
-    public List<Sample> Samples { get; set; }
+    public double Value { get; set; }
     public PhisicalQuantity PhisicalQuantity { get; set; }
 }

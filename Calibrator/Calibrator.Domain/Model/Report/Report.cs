@@ -4,8 +4,13 @@ public class Report
 {
     public string Operator { get; set; }
     public DateTime Date { get; set; }
-    public List<SensorChannel> Channels { get; set; }
-    public List<Experiment> Experiments { get; set; }
-    public Dictionary<string, List<double>> EnvironmentProperties { get; set; }
+    public List<Sensor> Sensors { get; set; }
+}
 
+public enum PhisicalQuantity
+{
+    Temperature,
+    Mass,
+    Force,
+    Preassure
 }
