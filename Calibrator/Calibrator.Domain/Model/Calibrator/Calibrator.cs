@@ -13,12 +13,12 @@ public class Calibrator
         return coefficients[0] * parameter * parameter + coefficients[1] * parameter + coefficients[2];
     }
 
-    private static void CalculateTargetPhisicalValues(SensorChannel channel)
+    public static void CalculateTargetPhisicalValues(SensorChannel channel) //private
     {
         CalculateCoefficients(channel);
-        foreach (var samle in channel.Samples)
+        foreach (var sample in channel.Samples)
         {
-            samle.TargetQuantityValue = Approximate(samle.Paremeter);
+            sample.PhisicalQuantityValue = Approximate(sample.Paremeter);
         }
     }
 
