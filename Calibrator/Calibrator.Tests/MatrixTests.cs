@@ -34,7 +34,7 @@ public class MatrixTests
             matrix[i] = row;
         }
 
-        var determinant = Matrix.GetDeterminant(matrix);
+        var determinant = LeastSquareMethod.GetDeterminant(matrix);
 
         Assert.Equal(expected, determinant);
     }
@@ -54,7 +54,7 @@ public class MatrixTests
             channel.Parameters.Add(new Entry() { Start = DateTime.Now, End = DateTime.Now, ReferenceValue = args[i] }, args[i + 1]);
         }
 
-        var coefficients = Matrix.GetCoeffitients(channel);
+        var coefficients = LeastSquareMethod.GetCoeffitients(channel);
         
         
         for (int i = 0; i <  coefficients.Length; i++)

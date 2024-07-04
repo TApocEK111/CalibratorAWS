@@ -9,5 +9,5 @@ public class Sensor
     public DateTime? ManufactureDate { get; private set; } = null;
     public int? EffectiveRange { get; private set; } = null;
 
-    public List<SensorChannel> sensorChannels { get; private set; }
+    public List<SensorChannel> Channels { get; private set; }
 }

@@ -1,6 +1,6 @@
-﻿namespace Calibrator.Domain.Model.Approximator;
+﻿namespace Calibrator.Domain.Model.Calibrator;
 
-public static class Matrix
+public static class LeastSquareMethod
 {
     public static double GetDeterminant(double[][] matrix)
     {
@@ -35,13 +35,13 @@ public static class Matrix
     }
     public static double[] GetCoeffitients(Report.SensorChannel channel)
     {
-        double[] X = new double[channel.Parameters.Count];
-        double[] Y = new double[channel.Parameters.Count];
+        double[] X = new double[channel.Samples.Count];
+        double[] Y = new double[channel.Samples.Count];
         int i = 0;
-        foreach (var parameter in channel.Parameters)
+        foreach (var sample in channel.Samples)
         {
-            X[i] = parameter.Key.ReferenceValue;
-            Y[i] = parameter.Value;
+            X[i] = sample.ReferenceValue;
+            Y[i] = sample.Paremeter;
             i++;
         }
 
