@@ -76,14 +76,20 @@ public static class LeastSquareMethod
 
         for (int j = 0; j < 3; j++)
         {
-            double[] t = new double[3];
+            double[] t0 = new double[3];
+            double[] t1 = new double[3];
+            double[] t2 = new double[3];
+
             for (int k = 0; k < 3; k++)
             {
-                t[k] = m[j][k];
+                t0[k] = m[j][k];
+                t1[k] = m[j][k];
+                t2[k] = m[j][k];
+
             }
-            ma[j] = t;
-            mb[j] = t;
-            mc[j] = t;
+            ma[j] = t0;
+            mb[j] = t1;
+            mc[j] = t2;
         }
 
 
