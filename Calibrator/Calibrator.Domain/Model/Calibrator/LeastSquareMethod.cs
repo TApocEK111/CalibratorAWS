@@ -35,10 +35,10 @@ public static class LeastSquareMethod
     }
     public static double[] GetCoeffitients(Report.SensorChannel channel)
     {
-        double[] X = new double[channel.Samples.Count];
-        double[] Y = new double[channel.Samples.Count];
+        double[] X = new double[channel.AvgSamples.Count];
+        double[] Y = new double[channel.AvgSamples.Count];
         int i = 0;
-        foreach (var sample in channel.Samples)
+        foreach (var sample in channel.AvgSamples)
         {
             X[i] = sample.ReferenceValue;
             Y[i] = sample.Paremeter;
@@ -54,18 +54,22 @@ public static class LeastSquareMethod
                 interceptTerms[j] += Math.Pow(X[k], 2 - j) * Y[k];
         }
 
+        double[] powers = new double[5];
+
+        for (int l = powers.Length - 1; l >= 0; l--) //вычисление сумм степеней параметров
+        {
+            for (int k = 0; k < X.Length; k++)
+            {
+                powers[l] += Math.Pow(X[k], l);
+            }
+        }
+
         for (int j = 0; j < 3; j++) //заполнение матрицы m
         {
             double[] t = new double[3];
             for (int l = 0; l < 3; l++)
             {
-                for (int k = 0; k < X.Length; k++)
-                {
-                    t[l] += Math.Pow(X[k], 4 - l - j);
-                }
-
-                if (j == 2 && l == 2)
-                    t[l] = X.Length;
+                t[l] = powers[4 - l - j];
             }
             m[j] = t;
         }
@@ -114,7 +118,7 @@ public static class LeastSquareMethod
         double deltaM = GetDeterminant(m);
         if (deltaM == 0)
         {
-            throw new Exception("Sensor is kal");
+            throw new Exception("Sensor is invalid");
         }
         double[] result = [GetDeterminant(ma) / deltaM, GetDeterminant(mb) / deltaM, GetDeterminant(mc) / deltaM];
         return result;

@@ -4,7 +4,7 @@ public class Sample
 {
     public double ReferenceValue { get; set; }
     public DateTime MeasurementTime { get; set; }
-    public double? PhisicalQuantityValue { get; set; }
+    public double? ResultantPhysicalQuantity { get; set; }  //над названием стоит еще подумать
     public double Paremeter { get; set; }
     public List<ExternalImpact> ExternalImpacts { get; set; }
 }
