@@ -2,7 +2,7 @@
 
 public static class LeastSquareMethod
 {
-    public static double GetDeterminant(double[][] matrix)
+    private static double GetDeterminant(double[][] matrix)
     {
         if (matrix.Length == 1)
             return matrix[0][0];
