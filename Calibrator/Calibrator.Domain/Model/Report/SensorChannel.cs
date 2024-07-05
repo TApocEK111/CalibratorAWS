@@ -27,13 +27,13 @@ public class SensorChannel
                     int counter = 0;
                     while (Samples[i].ReferenceValue == Samples[i + 1].ReferenceValue)
                     {
-                        sum += Samples[i].Paremeter;
-                        sum += Samples[j].Paremeter;
+                        sum += Samples[i].Parameter;
+                        sum += Samples[j].Parameter;
                         counter += 2;
                         i++;
                         j--;
                     }
-                    tempSample.Paremeter = sum / counter;
+                    tempSample.Parameter = sum / counter;
                     _avgSamples.Add(tempSample);
                 }
                 return _avgSamples;

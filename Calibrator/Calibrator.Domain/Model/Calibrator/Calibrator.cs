@@ -18,7 +18,7 @@ public class Calibrator
         CalculateCoefficients(channel);
         foreach (var sample in channel.Samples)
         {
-            sample.ResultantPhysicalQuantity = Approximate(sample.Paremeter);
+            sample.ResultantPhysicalQuantity = Approximate(sample.Parameter);
             sample.Error = Math.Abs(sample.ReferenceValue - (double)sample.ResultantPhysicalQuantity);
         }
     }
