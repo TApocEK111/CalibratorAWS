@@ -23,13 +23,13 @@ public class LSMTests
         
         
         for (int i = 0; i <  coefficients.Length; i++)
-            Assert.True(IsInBounds(expected[i], coefficients[i]));
+            Assert.True(IsInBounds(expected[i], coefficients[i], 0.005));
     }
 
-    private bool IsInBounds(double expected, double arg)
+    private bool IsInBounds(double expected, double arg, double error)
     {
         if (arg * expected < 0)
             return false;
-        return Math.Abs(arg) >= Math.Abs(expected * 0.995) && Math.Abs(arg) <= Math.Abs(expected * 1.005);
+        return Math.Abs(arg) >= Math.Abs(expected - expected * error) && Math.Abs(arg) <= Math.Abs(expected + expected * error);
     }
 }
