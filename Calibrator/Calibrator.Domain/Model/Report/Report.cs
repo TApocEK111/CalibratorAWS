@@ -4,7 +4,7 @@ public class Report
 {
     public string Operator { get; set; }
     public DateTime Date { get; set; }
-    public List<Sensor> Sensors { get; set; }
+    public List<Sensor> Sensors { get; set; } = null!;
 }
 
 public enum PhisicalQuantity

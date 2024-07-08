@@ -5,10 +5,10 @@ public class SensorChannel
     private int revIndex = 0;
     private List<Sample> _forward;
     private List<Sample> _reverse;
-    private List<Sample> _avgSamples;
+    private List<AverageSample> _avgSamples;
 
-    public List<Sample> Samples { get; set; }
-    public List<Sample> AvgSamples
+    public List<Sample> Samples { get; set; } = new List<Sample>();
+    public List<AverageSample> AvgSamples
     {
         get
         {
@@ -18,24 +18,26 @@ public class SensorChannel
                 throw new NullReferenceException("Samples are null.");
             else
             {
-                _avgSamples = new List<Sample>();
-                for (int i = 0, j = Samples.Count - 1; j - i >= 0; i++, j--)
+                _avgSamples = new List<AverageSample>();
+                Dictionary<double, double[]> uniques = new Dictionary<double, double[]>();
+
+                for (int i = 0; i < Samples.Count; i++)
                 {
-                    Sample tempSample = new Sample();
-                    tempSample.ReferenceValue = Samples[i].ReferenceValue;
-                    double sum = 0;
-                    int counter = 0;
-                    while (Samples[i].ReferenceValue == Samples[i + 1].ReferenceValue)
+                    if (!uniques.TryAdd(Samples[i].ReferenceValue, [Samples[i].Parameter, 1]))
                     {
-                        sum += Samples[i].Parameter;
-                        sum += Samples[j].Parameter;
-                        counter += 2;
-                        i++;
-                        j--;
+                        uniques[Samples[i].ReferenceValue][0] += Samples[i].Parameter;
+                        uniques[Samples[i].ReferenceValue][1] ++;
                     }
-                    tempSample.Parameter = sum / counter;
+                }
+
+                foreach (var sample in uniques)
+                {
+                    AverageSample tempSample = new AverageSample();
+                    tempSample.ReferenceValue = sample.Key;
+                    tempSample.Parameter = sample.Value[0] / sample.Value[1];
                     _avgSamples.Add(tempSample);
                 }
+
                 return _avgSamples;
             }
         }
@@ -118,9 +120,5 @@ public class SensorChannel
         {
             _reverse = value;
         }
-    }
-    public SensorChannel()
-    {
-
     }
 }
