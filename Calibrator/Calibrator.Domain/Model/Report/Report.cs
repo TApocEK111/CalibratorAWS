@@ -2,13 +2,15 @@
 
 public class Report
 {
-    public string Operator { get; set; }
-    public DateTime Date { get; set; }
-    public List<Sensor> Sensors { get; set; } = null!;
+    public Guid Id { get; set; }
+    public string Operator { get; set; } = string.Empty;
+    public DateTime Date { get; set; } = DateTime.Now;
+    public List<Sensor> Sensors { get; set; } = new List<Sensor>();
 }
 
-public enum PhisicalQuantity
+public enum PhysicalQuantity
 {
+    Udefined,
     Temperature,
     Mass,
     Force,

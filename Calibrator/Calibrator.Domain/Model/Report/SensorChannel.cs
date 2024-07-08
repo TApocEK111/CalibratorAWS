@@ -2,123 +2,62 @@
 
 public class SensorChannel
 {
-    private int revIndex = 0;
-    private List<Sample> _forward;
-    private List<Sample> _reverse;
-    private List<AverageSample> _avgSamples;
-
+    public Guid Id { get; set; }
     public List<Sample> Samples { get; set; } = new List<Sample>();
-    public List<AverageSample> AvgSamples
+    public List<AverageSample> AvgSamples { get; set; } = null!;
+    public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
+
+    public void DefineSamplesDirections()
     {
-        get
+        if (Samples.Count == 0)
+            throw new ArgumentException("Samples is empty.");
+
+        Samples[0].Direction = Direction.Forward;
+        double forward = Samples[1].ReferenceValue - Samples[0].ReferenceValue;
+        for (int i = 1; i < Samples.Count; i++)
         {
-            if (_avgSamples != null)
-                return _avgSamples;
-            if (Samples == null)
-                throw new NullReferenceException("Samples are null.");
+            double sign = Samples[i].ReferenceValue - Samples[i - 1].ReferenceValue;
+            if (forward > 0)
+            {
+                if (sign > 0)
+                    Samples[i].Direction = Direction.Forward;
+                else
+                    Samples[i].Direction = Direction.Reverse;
+            }
             else
             {
-                _avgSamples = new List<AverageSample>();
-                Dictionary<double, double[]> uniques = new Dictionary<double, double[]>();
-
-                for (int i = 0; i < Samples.Count; i++)
-                {
-                    if (!uniques.TryAdd(Samples[i].ReferenceValue, [Samples[i].Parameter, 1]))
-                    {
-                        uniques[Samples[i].ReferenceValue][0] += Samples[i].Parameter;
-                        uniques[Samples[i].ReferenceValue][1] ++;
-                    }
-                }
-
-                foreach (var sample in uniques)
-                {
-                    AverageSample tempSample = new AverageSample();
-                    tempSample.ReferenceValue = sample.Key;
-                    tempSample.Parameter = sample.Value[0] / sample.Value[1];
-                    _avgSamples.Add(tempSample);
-                }
-
-                return _avgSamples;
-            }
-        }
-        set
-        {
-            _avgSamples = value;
-        }
-    }
-    public PhisicalQuantity PhisicalQuantity { get; set; }
-    public List<Sample> Forward 
-    { 
-        get 
-        {
-            if (_forward != null)
-                return _forward;
-            if (Samples == null)
-                throw new NullReferenceException("Samples are null.");
-            else if (revIndex == 0)
-            {
-                revIndex = 1;
-                while (Samples[revIndex].ReferenceValue == Samples[revIndex - 1].ReferenceValue)
-                    revIndex++;
-                double sign = Samples[revIndex].ReferenceValue - Samples[revIndex - 1].ReferenceValue;
                 if (sign < 0)
-                {
-                    while (revIndex < Samples.Count && Samples[revIndex].ReferenceValue - Samples[revIndex - 1].ReferenceValue <= 0)
-                        revIndex++;
-                }
+                    Samples[i].Direction = Direction.Forward;
                 else
-                {
-                    while (revIndex < Samples.Count && Samples[revIndex].ReferenceValue - Samples[revIndex - 1].ReferenceValue >= 0)
-                        revIndex++;
-                }
+                    Samples[i].Direction = Direction.Reverse;
             }
-            _forward = new List<Sample>(revIndex);
-            for (int i = 0; i < revIndex; i++)
-            {
-                _forward.Add(Samples[i]);
-            }
-            return _forward;
-        }
-        private set
-        {
-            _forward = value;
         }
     }
-    public List<Sample> Reverse 
+    public void CalculateAverageSamples()
     {
-        get
+        if (Samples == null)
+            throw new NullReferenceException("Samples are null.");
+        else
         {
-            if (_reverse != null)
-                return _reverse;
-            if (Samples == null)
-                throw new NullReferenceException("Samples are null.");
-            else if (revIndex == 0)
+            AvgSamples = new List<AverageSample>();
+            Dictionary<double, double[]> uniques = new Dictionary<double, double[]>();
+
+            for (int i = 0; i < Samples.Count; i++)
             {
-                revIndex = 1;
-                while (Samples[revIndex].ReferenceValue == Samples[revIndex - 1].ReferenceValue)
-                    revIndex++;
-                double sign = Samples[revIndex].ReferenceValue - Samples[revIndex - 1].ReferenceValue;
-                if (sign < 0)
+                if (!uniques.TryAdd(Samples[i].ReferenceValue, [Samples[i].Parameter, 1]))
                 {
-                    while (revIndex < Samples.Count && Samples[revIndex].ReferenceValue - Samples[revIndex - 1].ReferenceValue <= 0)
-                        revIndex++;
-                }
-                else
-                {
-                    while (revIndex < Samples.Count && Samples[revIndex].ReferenceValue - Samples[revIndex - 1].ReferenceValue >= 0)
-                        revIndex++;
+                    uniques[Samples[i].ReferenceValue][0] += Samples[i].Parameter;
+                    uniques[Samples[i].ReferenceValue][1]++;
                 }
             }
-            _reverse = new List<Sample>(Samples.Count - 1 - revIndex);
-            for (int i = revIndex; i < Samples.Count; i++)
+
+            foreach (var sample in uniques)
             {
-                _reverse.Add(Samples[i]);
+                AverageSample tempSample = new AverageSample();
+                tempSample.ReferenceValue = sample.Key;
+                tempSample.Parameter = sample.Value[0] / sample.Value[1];
+                AvgSamples.Add(tempSample);
             }
-            return _reverse;
-        }
-        private set
-        {
-            _reverse = value;
         }
     }
 }

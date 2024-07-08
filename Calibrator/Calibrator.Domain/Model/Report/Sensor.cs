@@ -2,12 +2,13 @@
 
 public class Sensor
 {
-    public Guid Id { get; set; } //private set
-    public string Type { get; private set; } = string.Empty;
-    public string? SerialNumber { get; private set; } = null;
-    public string? SoftwareVersion { get; private set; } = null;
-    public DateTime? ManufactureDate { get; private set; } = null;
-    public int? EffectiveRange { get; private set; } = null;
+    public Guid Id { get; set; }
+    public string Type { get; set; } = string.Empty;
+    public string SerialNumber { get; set; } = string.Empty;
+    public string SoftwareVersion { get; set; } = string.Empty;
+    public DateTime? ManufactureDate { get; set; } = null!;
+    public double EffectiveRangeMin {  get; set; }
+    public double EffectiveRangeMax { get; set; }
 
-    public List<SensorChannel> Channels { get; set; }
+    public List<SensorChannel> Channels { get; set; } = new List<SensorChannel>();
 }

@@ -2,6 +2,7 @@
 
 public class ExternalImpact
 {
+    public Guid Id { get; set; }
     public double Value { get; set; }
-    public PhisicalQuantity PhisicalQuantity { get; set; }
+    public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
 }

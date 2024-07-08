@@ -4,32 +4,26 @@ namespace Calibrator.Domain.Model.Calibrator;
 
 public class Calibrator
 {
-    private static double[] coefficients;
+    private double[] coefficients;
 
-    private static void CalculateCoefficients(SensorChannel channel) => coefficients = LeastSquareMethod.GetCoeffitients(channel);
-
-    private static double Approximate(double parameter)
+    private void ApproximateCoefficients(SensorChannel channel) => coefficients = LeastSquareMethod.GetCoeffitients(channel);
+    private double GradFunction(double parameter) => coefficients[0] * parameter * parameter + coefficients[1] * parameter + coefficients[2];
+    private void CalculatePhysicalQuantity(SensorChannel channel)
     {
-        return coefficients[0] * parameter * parameter + coefficients[1] * parameter + coefficients[2];
-    }
-
-    public static void CalculateTargetPhisicalValues(SensorChannel channel) //private
-    {
-        CalculateCoefficients(channel);
+        ApproximateCoefficients(channel);
         foreach (var sample in channel.Samples)
         {
-            sample.ResultantPhysicalQuantity = Approximate(sample.Parameter);
-            sample.Error = Math.Abs(sample.ReferenceValue - (double)sample.ResultantPhysicalQuantity);
+            sample.PhysicalQuantity = GradFunction(sample.Parameter);
         }
     }
 
-    public static void CalculateTargetPhisicalValues(Report.Report report)
+    public void CalculateTargetPhisicalValues(Report.Report report)
     {
         foreach (var sensor in report.Sensors)
         {
             foreach (var channel in sensor.Channels)
             {
-                CalculateTargetPhisicalValues(channel);
+                CalculatePhysicalQuantity(channel);
             }
         }
     }
