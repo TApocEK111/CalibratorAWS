@@ -1,11 +1,18 @@
 ﻿namespace Calibrator.Domain.Model.Report;
 
-internal class Report
+public class Report
 {
-    public string Operator { get; set; }
-    public DateTime Date { get; set; }
-    public List<Channel> Channels { get; set; }
-    public List<Experiment> Experiments { get; set; }
-    public Dictionary<string, List<double>> EnvironmentProperties { get; set; }
+    public Guid Id { get; set; }
+    public string Operator { get; set; } = string.Empty;
+    public DateTime Date { get; set; } = DateTime.Now;
+    public List<Sensor> Sensors { get; set; } = new List<Sensor>();
+}
 
+public enum PhysicalQuantity
+{
+    Udefined,
+    Temperature,
+    Mass,
+    Force,
+    Preassure
 }
