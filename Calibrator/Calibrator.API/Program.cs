@@ -1,4 +1,6 @@
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Calibrator.API
 {
     public class Program
@@ -13,6 +15,8 @@ namespace Calibrator.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<Infrastructure.Data.Context>();
 
             var app = builder.Build();
 
