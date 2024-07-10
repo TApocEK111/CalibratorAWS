@@ -20,7 +20,15 @@ public class ReportRepository
 
     public async Task<List<Report>> GetAllAsync()
     {
-        return await _context.Reports.Include(r => r.Sensors).OrderBy(r => r.Date).ToListAsync();
+        return await _context.Reports
+            .Include(r => r.Sensors)
+            .ThenInclude(s => s.Channels)
+            .ThenInclude(c => c.AvgSamples)
+            .Include(r => r.Sensors)
+            .ThenInclude(s => s.Channels)
+            .ThenInclude(c => c.Samples)
+            .ThenInclude(s => s.ExternalImpacts)
+            .OrderBy(r => r.Date).ToListAsync();
     }
 
     public async Task<Report> GetByIdAsync(Guid id)

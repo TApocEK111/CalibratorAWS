@@ -4,7 +4,7 @@ public class Report
 {
     public Guid Id { get; set; }
     public string Operator { get; set; } = string.Empty;
-    public DateTime Date { get; set; } = DateTime.Now;
+    public DateTime Date { get; set; } = DateTime.Now.ToUniversalTime();
     public List<Sensor> Sensors { get; set; } = new List<Sensor>();
 }
 

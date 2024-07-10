@@ -6,7 +6,7 @@ public class Sensor
     public string Type { get; set; } = string.Empty;
     public string SerialNumber { get; set; } = string.Empty;
     public string SoftwareVersion { get; set; } = string.Empty;
-    public DateTime? ManufactureDate { get; set; } = null!;
+    public DateTime? ManufactureDate { get; set; } //must be in UTC
     public double EffectiveRangeMin {  get; set; }
     public double EffectiveRangeMax { get; set; }
 

@@ -17,7 +17,7 @@ public class Calibrator
         }
     }
 
-    public void CalculateTargetPhisicalValues(Report.Report report)
+    public void CalculatePhysicalQuantitylValues(Report.Report report)
     {
         foreach (var sensor in report.Sensors)
         {
