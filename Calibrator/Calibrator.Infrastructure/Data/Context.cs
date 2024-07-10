@@ -21,11 +21,11 @@ public class Context : DbContext
     {
         modelBuilder.Entity<Sample>().Ignore(s => s.Error);
 
-        modelBuilder.Entity<Report>().HasMany(r => r.Sensors).WithOne(s => s.Report).HasForeignKey(s => s.Report);
-        modelBuilder.Entity<Sensor>().HasMany(s => s.Channels).WithOne(c => c.Sensor).HasForeignKey(c => c.Sensor);
-        modelBuilder.Entity<SensorChannel>().HasMany(c => c.Samples).WithOne(s => s.Channel).HasForeignKey(c => c.Channel);
-        modelBuilder.Entity<SensorChannel>().HasMany(c => c.AvgSamples).WithOne(s => s.Channel).HasForeignKey(s => s.Channel);
-        modelBuilder.Entity<Sample>().HasMany(s => s.ExternalImpacts).WithOne(i => i.Sample).HasForeignKey(i => i.Sample);
+        //modelBuilder.Entity<Report>().HasMany(r => r.Sensors).WithOne(s => s.Report).HasForeignKey(s => s.Report);
+        //modelBuilder.Entity<Sensor>().HasMany(s => s.Channels).WithOne(c => c.Sensor).HasForeignKey(c => c.Sensor);
+        //modelBuilder.Entity<SensorChannel>().HasMany(c => c.Samples).WithOne(s => s.Channel).HasForeignKey(c => c.Channel);
+        //modelBuilder.Entity<SensorChannel>().HasMany(c => c.AvgSamples).WithOne(s => s.Channel).HasForeignKey(s => s.Channel);
+        //modelBuilder.Entity<Sample>().HasMany(s => s.ExternalImpacts).WithOne(i => i.Sample).HasForeignKey(i => i.Sample);
 
         modelBuilder.Entity<Report>().HasMany(r => r.Sensors).WithOne(s => s.Report).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<Sensor>().HasMany(s => s.Channels).WithOne(c => c.Sensor).OnDelete(DeleteBehavior.Cascade);

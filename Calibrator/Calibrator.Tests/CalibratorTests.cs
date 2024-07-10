@@ -8,12 +8,5 @@ namespace Calibrator.Tests
         {
 
         }
-
-        private bool IsInBounds(double expected, double arg, double error)
-        {
-            if (arg * expected < 0)
-                return false;
-            return Math.Abs(arg) >= Math.Abs(expected - expected * error) && Math.Abs(arg) <= Math.Abs(expected + expected * error);
-        }
     }
 }

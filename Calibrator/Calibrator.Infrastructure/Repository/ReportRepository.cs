@@ -30,15 +30,15 @@ public class ReportRepository
             .ThenInclude(s => s.ExternalImpacts)
             .OrderBy(r => r.Date).ToListAsync();
         
-        foreach (var report in reports)
+        for (int i = 0; i < reports.Count; i++)
         {
-            foreach (var sensor in report.Sensors)
+            for (int j = 0; j < reports[i].Sensors.Count; j++)
             {
-                sensor.Channels.OrderBy(c => c.Number);
-                foreach (var channel in sensor.Channels)
+                reports[i].Sensors[j].Channels = reports[i].Sensors[j].Channels.OrderBy(c => c.Number).ToList();
+                for (int k = 0; k < reports[i].Sensors[j].Channels.Count; k++)
                 {
-                    channel.Samples.OrderBy(s => s.MeasurementTime);
-                    channel.AvgSamples.OrderBy(s => s.ReferenceValue);
+                    reports[i].Sensors[j].Channels[k].Samples = reports[i].Sensors[j].Channels[k].Samples.OrderBy(s => s.MeasurementTime).ToList();
+                    reports[i].Sensors[j].Channels[k].AvgSamples = reports[i].Sensors[j].Channels[k].AvgSamples.OrderBy(s => s.ReferenceValue).ToList();
                 }
             }
         }
@@ -48,7 +48,7 @@ public class ReportRepository
 
     public async Task<Report> GetByIdAsync(Guid id)
     {
-        var result = (from report in _context.Reports
+        var result = await (from report in _context.Reports
                         .Include(r => r.Sensors)
                         .ThenInclude(s => s.Channels)
                         .ThenInclude(c => c.AvgSamples)
@@ -58,9 +58,20 @@ public class ReportRepository
                         .ThenInclude(s => s.ExternalImpacts)
                       where report.Id == id
                       select report).FirstOrDefaultAsync();
+        if (result == null)
+            throw new NullReferenceException("No such report");
 
+        for (int j = 0; j < result.Sensors.Count; j++)
+        {
+            result.Sensors[j].Channels = result.Sensors[j].Channels.OrderBy(c => c.Number).ToList();
+            for (int k = 0; k < result.Sensors[j].Channels.Count; k++)
+            {
+                result.Sensors[j].Channels[k].Samples = result.Sensors[j].Channels[k].Samples.OrderBy(s => s.MeasurementTime).ToList();
+                result.Sensors[j].Channels[k].AvgSamples = result.Sensors[j].Channels[k].AvgSamples.OrderBy(s => s.ReferenceValue).ToList();
+            }
+        }
 
-        return await result ?? throw new NullReferenceException("No such report");
+        return result;
     }
 
     public async Task<Report> AddAsync(Report report)

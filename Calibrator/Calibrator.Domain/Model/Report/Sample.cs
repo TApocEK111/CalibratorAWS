@@ -2,9 +2,11 @@
 
 public class Sample
 {
+    private DateTime _measurementTime = DateTime.Now.ToUniversalTime();
+
     public Guid Id { get; set; }
     public double ReferenceValue { get; set; }
-    public DateTime MeasurementTime { get; set; } = DateTime.Now.ToUniversalTime(); 
+    public DateTime MeasurementTime { get { return _measurementTime; } set { _measurementTime = value.ToUniversalTime(); } }
     public double PhysicalQuantity { get; set; }
     public double Parameter { get; set; }
     public double Error { get { return Math.Abs(ReferenceValue - PhysicalQuantity); } }

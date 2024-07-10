@@ -7,7 +7,7 @@ namespace Calibrator.Tests.Repository;
 public class TestHelper
 {
     private readonly Context _context;
-    public Report TestReport = new Report
+    public Report TestReport2 = new Report
     {
         Sensors = new List<Sensor>
             {
@@ -25,6 +25,34 @@ public class TestHelper
                                 new Sample() { ReferenceValue = 60, Parameter = 59 },
                                 new Sample() { ReferenceValue = 70, Parameter = 70 },
                                 new Sample() { ReferenceValue = 50, Parameter = 51 }
+                            }
+                        }
+                    }
+                }
+            }
+    };
+
+    public Report TestReport1 = new Report
+    {
+        Date = DateTime.MinValue.ToUniversalTime(),
+        Sensors = new List<Sensor>
+            {
+                new Sensor
+                {
+                    Channels = new List<SensorChannel>()
+                    {
+                        new SensorChannel()
+                        {
+                            Samples = new List<Sample>()
+                            {
+                                new Sample() { ReferenceValue = -10, Parameter = -1 },
+                                new Sample() { ReferenceValue = -10, Parameter = -0.9 },
+                                new Sample() { ReferenceValue = -20, Parameter = -2 },
+                                new Sample() { ReferenceValue = -30, Parameter = -2.9 },
+                                new Sample() { ReferenceValue = -20, Parameter = -2.1 },
+                                new Sample() { ReferenceValue = -20, Parameter = -1.9 },
+                                new Sample() { ReferenceValue = -20, Parameter = -2 },
+                                new Sample() { ReferenceValue = -10, Parameter = -1.1 }
                             }
                         }
                     }
@@ -51,41 +79,13 @@ public class TestHelper
         _context.Database.EnsureDeleted();
         _context.Database.EnsureCreated();
 
-        var report = new Report
-        {
-            Date = DateTime.MinValue.ToUniversalTime(),
-            Sensors = new List<Sensor>
-            {
-                new Sensor
-                {
-                    Channels = new List<SensorChannel>()
-                    {
-                        new SensorChannel()
-                        {
-                            Samples = new List<Sample>()
-                            {
-                                new Sample() { ReferenceValue = -10, Parameter = -1 },
-                                new Sample() { ReferenceValue = -10, Parameter = -0.9 },
-                                new Sample() { ReferenceValue = -20, Parameter = -2 },
-                                new Sample() { ReferenceValue = -30, Parameter = -2.9 },
-                                new Sample() { ReferenceValue = -20, Parameter = -2.1 },
-                                new Sample() { ReferenceValue = -20, Parameter = -1.9 },
-                                new Sample() { ReferenceValue = -20, Parameter = -2 },
-                                new Sample() { ReferenceValue = -10, Parameter = -1.1 }
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
-        report.Sensors[0].Channels[0].CalculateAverageSamples();
-        TestReport.Sensors[0].Channels[0].CalculateAverageSamples();
+        TestReport1.Sensors[0].Channels[0].CalculateAverageSamples();
+        TestReport2.Sensors[0].Channels[0].CalculateAverageSamples();
 
         var calibrator = new Domain.Model.Calibrator.Calibrator();
-        calibrator.CalculatePhysicalQuantitylValues(report);
+        calibrator.CalculatePhysicalQuantitylValues(TestReport1);
 
-        _context.Add(report);
+        _context.Add(TestReport1);
         _context.SaveChanges();
 
         _context.ChangeTracker.Clear();

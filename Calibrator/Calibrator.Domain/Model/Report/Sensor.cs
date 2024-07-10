@@ -2,11 +2,13 @@
 
 public class Sensor
 {
+    private DateTime _manufactureDate;
+
     public Guid Id { get; set; }
     public string Type { get; set; } = string.Empty;
     public string SerialNumber { get; set; } = string.Empty;
     public string SoftwareVersion { get; set; } = string.Empty;
-    public DateTime? ManufactureDate { get; set; } //must be in UTC
+    public DateTime ManufactureDate { get { return _manufactureDate; } set { _manufactureDate = value.ToUniversalTime(); } } //biohazard
     public double EffectiveRangeMin {  get; set; }
     public double EffectiveRangeMax { get; set; }
 
