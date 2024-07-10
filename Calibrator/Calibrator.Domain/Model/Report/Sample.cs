@@ -11,7 +11,6 @@ public class Sample
     public List<ExternalImpact> ExternalImpacts { get; set; } = new List<ExternalImpact>();
     public Direction Direction { get; set; } = Direction.Undefined;
 
-    public Guid ChannelId { get; set; }
     public SensorChannel Channel { get; set; }
 }
 public enum Direction

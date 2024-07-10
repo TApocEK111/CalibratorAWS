@@ -7,6 +7,5 @@ public class AverageSample
     public double Parameter { get; set; }
     public double PhysicalQuantity { get; set; }
 
-    public Guid ChannelId { get; set; }
     public SensorChannel Channel { get; set; }
 }

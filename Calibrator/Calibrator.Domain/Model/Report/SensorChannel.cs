@@ -8,7 +8,6 @@ public class SensorChannel
     public List<AverageSample> AvgSamples { get; set; } = null!;
     public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
 
-    public Guid SensorId { get; set; }
     public Sensor Sensor { get; set; }
 
     public void DefineSamplesDirections()
