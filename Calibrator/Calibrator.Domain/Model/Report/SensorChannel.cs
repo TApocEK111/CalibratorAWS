@@ -3,9 +3,13 @@
 public class SensorChannel
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public List<Sample> Samples { get; set; } = new List<Sample>();
     public List<AverageSample> AvgSamples { get; set; } = null!;
     public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
+
+    public Guid SensorId { get; set; }
+    public Sensor Sensor { get; set; }
 
     public void DefineSamplesDirections()
     {

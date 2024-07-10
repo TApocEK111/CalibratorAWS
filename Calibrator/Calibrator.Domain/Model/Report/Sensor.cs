@@ -11,4 +11,7 @@ public class Sensor
     public double EffectiveRangeMax { get; set; }
 
     public List<SensorChannel> Channels { get; set; } = new List<SensorChannel>();
+
+    public Guid ReportId { get; set; }
+    public Report Report { get; set; }
 }

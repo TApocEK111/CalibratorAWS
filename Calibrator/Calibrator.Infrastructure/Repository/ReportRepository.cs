@@ -20,7 +20,7 @@ public class ReportRepository
 
     public async Task<List<Report>> GetAllAsync()
     {
-        return await _context.Reports
+        var reports = await _context.Reports
             .Include(r => r.Sensors)
             .ThenInclude(s => s.Channels)
             .ThenInclude(c => c.AvgSamples)
@@ -29,11 +29,38 @@ public class ReportRepository
             .ThenInclude(c => c.Samples)
             .ThenInclude(s => s.ExternalImpacts)
             .OrderBy(r => r.Date).ToListAsync();
+        
+        foreach (var report in reports)
+        {
+            foreach (var sensor in report.Sensors)
+            {
+                sensor.Channels.OrderBy(c => c.Number);
+                foreach (var channel in sensor.Channels)
+                {
+                    channel.Samples.OrderBy(s => s.MeasurementTime);
+                    channel.AvgSamples.OrderBy(s => s.ReferenceValue);
+                }
+            }
+        }
+
+        return reports;
     }
 
     public async Task<Report> GetByIdAsync(Guid id)
     {
-        return await _context.Reports.FindAsync(id) ?? throw new NullReferenceException("No such report");
+        var result = (from report in _context.Reports
+                        .Include(r => r.Sensors)
+                        .ThenInclude(s => s.Channels)
+                        .ThenInclude(c => c.AvgSamples)
+                        .Include(r => r.Sensors)
+                        .ThenInclude(s => s.Channels)
+                        .ThenInclude(c => c.Samples)
+                        .ThenInclude(s => s.ExternalImpacts)
+                      where report.Id == id
+                      select report).FirstOrDefaultAsync();
+
+
+        return await result ?? throw new NullReferenceException("No such report");
     }
 
     public async Task<Report> AddAsync(Report report)
