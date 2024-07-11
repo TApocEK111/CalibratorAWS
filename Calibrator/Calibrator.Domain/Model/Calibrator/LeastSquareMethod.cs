@@ -35,6 +35,7 @@ public static class LeastSquareMethod
     }
     public static double[] GetCoeffitients(Report.SensorChannel channel)
     {
+        channel.CalculateAverageSamples();
         double[] X = new double[channel.AvgSamples.Count];
         double[] Y = new double[channel.AvgSamples.Count];
         int i = 0;
