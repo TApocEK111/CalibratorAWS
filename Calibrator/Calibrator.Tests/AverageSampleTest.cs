@@ -15,6 +15,7 @@ public class AverageSampleTest
             channel.Samples.Add(new Sample() { ReferenceValue = references[i], Parameter = parameters[i] });
         }
 
+        channel.CalculateAverageSamples();
         int j = 0;
         foreach (var sample in channel.AvgSamples)
         {
