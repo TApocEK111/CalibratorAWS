@@ -17,7 +17,7 @@ public class AverageSampleTest
 
         channel.CalculateAverageSamples();
         int j = 0;
-        foreach (var sample in channel.AvgSamples)
+        foreach (var sample in channel.AverageSamples)
         {
             Assert.True(IsInBounds(sample.ReferenceValue, expectedRef[j], 0.05));
             Assert.True(IsInBounds(sample.Parameter, expectedPar[j], 0.05));

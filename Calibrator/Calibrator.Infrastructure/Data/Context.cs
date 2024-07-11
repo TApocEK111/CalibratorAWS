@@ -27,11 +27,11 @@ public class Context : DbContext
         //modelBuilder.Entity<SensorChannel>().HasMany(c => c.AvgSamples).WithOne(s => s.Channel).HasForeignKey(s => s.Channel);
         //modelBuilder.Entity<Sample>().HasMany(s => s.ExternalImpacts).WithOne(i => i.Sample).HasForeignKey(i => i.Sample);
 
-        modelBuilder.Entity<Report>().HasMany(r => r.Sensors).WithOne(s => s.Report).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Sensor>().HasMany(s => s.Channels).WithOne(c => c.Sensor).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<SensorChannel>().HasMany(c => c.Samples).WithOne(s => s.Channel).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<SensorChannel>().HasMany(c => c.AvgSamples).WithOne(s => s.Channel).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Sample>().HasMany(s => s.ExternalImpacts).WithOne(i => i.Sample).OnDelete(DeleteBehavior.Cascade);
+        //modelBuilder.Entity<Report>().HasMany(r => r.Sensors).WithOne(s => s.Report).OnDelete(DeleteBehavior.Cascade);
+        //modelBuilder.Entity<Sensor>().HasMany(s => s.Channels).WithOne(c => c.Sensor).OnDelete(DeleteBehavior.Cascade);
+        //modelBuilder.Entity<SensorChannel>().HasMany(c => c.Samples).WithOne(s => s.Channel).OnDelete(DeleteBehavior.Cascade);
+        //modelBuilder.Entity<SensorChannel>().HasMany(c => c.AvgSamples).WithOne(s => s.Channel).OnDelete(DeleteBehavior.Cascade);
+        //modelBuilder.Entity<Sample>().HasMany(s => s.ExternalImpacts).WithOne(i => i.Sample).OnDelete(DeleteBehavior.Cascade);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

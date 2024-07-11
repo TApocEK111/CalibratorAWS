@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Calibrator.Tests.Repository;
 
-public class TestHelper
+public class RepositoryTestHelper
 {
     private readonly Context _context;
     public Report TestReport2 = new Report
@@ -19,12 +19,12 @@ public class TestHelper
                         {
                             Samples = new List<Sample>()
                             {
-                                new Sample() { ReferenceValue = 50, Parameter = 51 },
-                                new Sample() { ReferenceValue = 50, Parameter = 48 },
-                                new Sample() { ReferenceValue = 60, Parameter = 62 },
-                                new Sample() { ReferenceValue = 60, Parameter = 59 },
-                                new Sample() { ReferenceValue = 70, Parameter = 70 },
-                                new Sample() { ReferenceValue = 50, Parameter = 51 }
+                                new Sample() { MeasurementTime = DateTime.Now, ReferenceValue = 50, Parameter = 51 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(1), ReferenceValue = 50, Parameter = 48 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(2), ReferenceValue = 60, Parameter = 62 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(3), ReferenceValue = 60, Parameter = 59 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(4), ReferenceValue = 70, Parameter = 70 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(5), ReferenceValue = 50, Parameter = 51 }
                             }
                         }
                     }
@@ -45,14 +45,14 @@ public class TestHelper
                         {
                             Samples = new List<Sample>()
                             {
-                                new Sample() { ReferenceValue = -10, Parameter = -1 },
-                                new Sample() { ReferenceValue = -10, Parameter = -0.9 },
-                                new Sample() { ReferenceValue = -20, Parameter = -2 },
-                                new Sample() { ReferenceValue = -30, Parameter = -2.9 },
-                                new Sample() { ReferenceValue = -20, Parameter = -2.1 },
-                                new Sample() { ReferenceValue = -20, Parameter = -1.9 },
-                                new Sample() { ReferenceValue = -20, Parameter = -2 },
-                                new Sample() { ReferenceValue = -10, Parameter = -1.1 }
+                                new Sample() { MeasurementTime = DateTime.Now, ReferenceValue = -10, Parameter = -1 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(1), ReferenceValue = -10, Parameter = -0.9 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(2), ReferenceValue = -20, Parameter = -2 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(3), ReferenceValue = -30, Parameter = -2.9 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(4), ReferenceValue = -20, Parameter = -2.1 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(5), ReferenceValue = -20, Parameter = -1.9 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(6), ReferenceValue = -20, Parameter = -2 },
+                                new Sample() { MeasurementTime = DateTime.Now.AddSeconds(7), ReferenceValue = -10, Parameter = -1.1 }
                             }
                         }
                     }
@@ -68,7 +68,7 @@ public class TestHelper
         }
     }
 
-    public TestHelper()
+    public RepositoryTestHelper()
     {
         var contextOptions = new DbContextOptionsBuilder<Context>()
             .UseNpgsql("Host=localhost;Port=5432;Database=TestReportDB;Username=postgres;Password=admin")

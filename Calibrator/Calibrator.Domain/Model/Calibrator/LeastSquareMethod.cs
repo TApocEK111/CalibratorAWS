@@ -35,11 +35,12 @@ public static class LeastSquareMethod
     }
     public static double[] GetCoeffitients(Report.SensorChannel channel)
     {
+
         channel.CalculateAverageSamples();
-        double[] X = new double[channel.AvgSamples.Count];
-        double[] Y = new double[channel.AvgSamples.Count];
+        double[] X = new double[channel.AverageSamples.Count];
+        double[] Y = new double[channel.AverageSamples.Count];
         int i = 0;
-        foreach (var sample in channel.AvgSamples)
+        foreach (var sample in channel.AverageSamples)
         {
             X[i] = sample.ReferenceValue;
             Y[i] = sample.Parameter;
