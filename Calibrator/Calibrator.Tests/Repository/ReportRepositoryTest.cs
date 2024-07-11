@@ -5,7 +5,7 @@ public class ReportRepositoryTest
     [Fact]
     public void CreatesDB()
     {
-        var testHelper = new TestHelper();
+        var testHelper = new RepositoryTestHelper();
         var personRepository = testHelper.ReportRepository;
 
         Assert.Equal(1, 1);
@@ -14,7 +14,7 @@ public class ReportRepositoryTest
     [Fact]
     public void AddsAndGetsAllCorrectly()
     {
-        var testHelper = new TestHelper();
+        var testHelper = new RepositoryTestHelper();
         var reportRepository = testHelper.ReportRepository;
         var report = testHelper.TestReport2;
 
@@ -28,22 +28,22 @@ public class ReportRepositoryTest
         var results = reportRepository.GetAllAsync().Result;
         Assert.True(results.Count == 2);
         Assert.Equal(results[1].Sensors[0].Channels[0].Samples.Count, 6);
-        Assert.Equal(results[1].Sensors[0].Channels[0].AvgSamples.Count, 3);
+        Assert.Equal(results[1].Sensors[0].Channels[0].AverageSamples.Count, 3);
         Assert.Equal(results[0].Sensors[0].Channels[0].Samples.Count, 8);
-        Assert.Equal(results[0].Sensors[0].Channels[0].AvgSamples.Count, 3);
+        Assert.Equal(results[0].Sensors[0].Channels[0].AverageSamples.Count, 3);
 
     }
 
     [Fact]
     public void GetsByIdCorrectly()
     {
-        var testHelper = new TestHelper();
+        var testHelper = new RepositoryTestHelper();
         var reportRepository = testHelper.ReportRepository;
 
         var report = reportRepository.GetByIdAsync(testHelper.TestReport1.Id).Result;
 
         Assert.Equal(report.Sensors[0].Channels[0].Samples.Count, 8);
-        Assert.Equal(report.Sensors[0].Channels[0].AvgSamples.Count, 3);
+        Assert.Equal(report.Sensors[0].Channels[0].AverageSamples.Count, 3);
 
 
         for (int i = 0; i < testHelper.TestReport1.Sensors[0].Channels[0].Samples.Count; i++)
@@ -55,7 +55,7 @@ public class ReportRepositoryTest
     [Fact]
     public void UpdatesDataCorrectly()
     {
-        var testHelper = new TestHelper();
+        var testHelper = new RepositoryTestHelper();
         var reportRepository = testHelper.ReportRepository;
         var reports = reportRepository.GetAllAsync().Result;
         //Запрещаем отслеживание сущностей (разрываем связи с БД)
@@ -83,15 +83,26 @@ public class ReportRepositoryTest
     [Fact]
     public void DeletesCorrectly()
     {
-        var testHelper = new TestHelper();
+        var testHelper = new RepositoryTestHelper();
         var reportRepository = testHelper.ReportRepository;
         var reports = reportRepository.GetAllAsync().Result;
         //Запрещаем отслеживание сущностей (разрываем связи с БД)
         reportRepository.ChangeTrackerClear();
         reportRepository.DeleteAsync(reports[0].Id).Wait();
 
+        var context = reportRepository.UnitOfWork;
+        var sensors = context.Sensors.ToList();
+        var channels = context.SensorChannels.ToList();
+        var samples = context.Samples.ToList();
+        var avgSamples = context.AverageSamples.ToList();
+        var externalImpacts = context.ExternalImpacts.ToList();
         var newReports = reportRepository.GetAllAsync().Result;
 
         Assert.Empty(newReports);
+        Assert.Empty(sensors);
+        Assert.Empty(channels);
+        Assert.Empty(samples);
+        Assert.Empty(avgSamples);
+        Assert.Empty(externalImpacts);
     }
 }

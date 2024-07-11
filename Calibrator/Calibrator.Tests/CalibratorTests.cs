@@ -2,10 +2,13 @@ namespace Calibrator.Tests
 {
     public class CalibratorTests
     {
-        [Theory]
-        [InlineData(new double[] { 1, 2, 3, 4, 5, 4, 3, 2, 1 }, new double[] { 101, 199, 302, 400, 501, 398, 301, 200, 98 })]
+        [Fact]
         public void CalibratesCorrectly(double[] references, double[] parameters)
         {
+            var testHelper = new TestHelper();
+            var report = testHelper.TestReport;
+
+            var calibrator = new Domain.Model.Calibrator.Calibrator();
 
         }
     }

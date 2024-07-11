@@ -5,7 +5,7 @@ public class SensorChannel
     public Guid Id { get; set; }
     public int Number { get; set; }
     public List<Sample> Samples { get; set; } = new List<Sample>();
-    public List<AverageSample> AvgSamples { get; set; } = null!;
+    public List<AverageSample> AverageSamples { get; set; } = null!;
     public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
 
     public Sensor Sensor { get; set; }
@@ -42,7 +42,7 @@ public class SensorChannel
             throw new NullReferenceException("Samples are null.");
         else
         {
-            AvgSamples = new List<AverageSample>();
+            AverageSamples = new List<AverageSample>();
             Dictionary<double, double[]> uniques = new Dictionary<double, double[]>();
 
             for (int i = 0; i < Samples.Count; i++)
@@ -59,7 +59,7 @@ public class SensorChannel
                 AverageSample tempSample = new AverageSample();
                 tempSample.ReferenceValue = sample.Key;
                 tempSample.Parameter = sample.Value[0] / sample.Value[1];
-                AvgSamples.Add(tempSample);
+                AverageSamples.Add(tempSample);
             }
         }
     }
