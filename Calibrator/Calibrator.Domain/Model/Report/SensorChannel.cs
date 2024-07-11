@@ -6,6 +6,7 @@ public class SensorChannel
     public int Number { get; set; }
     public List<Sample> Samples { get; set; } = new List<Sample>();
     public List<AverageSample> AverageSamples { get; set; } = null!;
+    public Coefficients Coefficients { get; set; }
     public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
 
     public Sensor Sensor { get; set; }
