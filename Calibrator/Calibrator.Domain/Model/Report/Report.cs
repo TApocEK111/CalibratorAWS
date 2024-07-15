@@ -6,6 +6,7 @@ public class Report
     public string Operator { get; set; } = string.Empty;
     public DateTime Date { get; set; } = DateTime.Now.ToUniversalTime();
     public List<Sensor> Sensors { get; set; } = new List<Sensor>();
+    public Guid SetpointId { get; set; }
 }
 
 public enum PhysicalQuantity
