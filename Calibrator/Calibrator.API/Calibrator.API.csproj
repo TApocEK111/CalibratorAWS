@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Calibrator.Domain\Calibrator.Domain.csproj" />
     <ProjectReference Include="..\Calibrator.Infrastructure\Calibrator.Infrastructure.csproj" />
   </ItemGroup>

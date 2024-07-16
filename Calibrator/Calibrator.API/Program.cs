@@ -18,6 +18,8 @@ namespace Calibrator.API
 
             builder.Services.AddDbContext<Infrastructure.Data.Context>();
 
+            builder.Services.AddSingleton<ExperimentManager>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
