@@ -4,6 +4,7 @@ using Calibrator.Infrastructure.Repository;
 using Calibrator.Domain.Model.Report;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text;
 
 namespace Calibrator.API;
 
@@ -14,7 +15,9 @@ public class ExperimentManager
     private ReportRepository _reportRepository;
     public string ActuatorId { get; private set; }
     public string SensorId { get; private set; }
-    private HttpClient _httpClient = new HttpClient() { BaseAddress = new Uri("https://actuatorsim.socketsomeone.me/api/actuators/") };
+    private HttpClient _httpClient = new HttpClient();
+    private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
+    private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
     public bool IsActuatorReady { get; set; } = false;
 
     public ExperimentManager(Context context)
@@ -31,29 +34,51 @@ public class ExperimentManager
 
     public async Task Start()
     {
-        var stopwatch = new System.Diagnostics.Stopwatch();
-        foreach (var exposure in _setpoint.Exposures)
-        {
-            stopwatch.Stop();
-            stopwatch.Reset();
-            await PostSetpointDataAsync(exposure);
-            while (!IsActuatorReady) { }
-            stopwatch.Start();
-            var sample = await GetSensorDataAsync();
-            sample.ReferenceValue = exposure.Value;
-        }
+        if (_setpoint == null)
+            throw new ArgumentNullException("Setpoint is null");
+
+        var timer = new System.Timers.Timer();
     }
 
-    public async Task PostSetpointDataAsync(Exposure exposure)
+    public async Task PostSetpointDataAsync(Setpoint setpoint)
     {
-        await _httpClient.PostAsync(_httpClient.BaseAddress + ActuatorId, new StringContent($"{{\r\n  \"value\": {exposure.Value},\r\n  \"exposures\": [\r\n    {{\r\n      \"value\": {exposure.Value},\r\n      \"duration\": {exposure.Duration},\r\n      \"speed\": {exposure.Speed}\r\n    }}\r\n  ]\r\n}}"));
+        await _httpClient.PostAsync(_actuatorsUri + ActuatorId, new StringContent($"" +
+            $"{{\r\n  " +
+                $"\"currentQuantity\": {{\r\n    " +
+                    $"\"value\": 0,\r\n    " +
+                    $"\"unit\": \"string\"\r\n  " +
+                $"}},\r\n  " +
+                $"\"targetQuantity\": {{\r\n    " +
+                    $"\"value\": {setpoint.Exposures[setpoint.Exposures.Count - 1].Value},\r\n    " +
+                    $"\"unit\": \"string\"\r\n  " +
+                $"}},\r\n  " +
+                $"\"exposures\": [\r\n    " +
+                    ExposuresToJsonList(setpoint) +
+                $"]\r\n}}"));
+    }
+
+    private string ExposuresToJsonList(Setpoint setpoint)
+    {
+        var builder = new StringBuilder();
+        int i = 0;
+        foreach (var exposure in setpoint.Exposures)
+        {
+            builder.Append($"{{\r\n      \"value\": {exposure.Value},\r\n      \"duration\": {exposure.Duration},\r\n      \"speed\": {exposure.Speed}\r\n    }}");
+            if (i < setpoint.Exposures.Count - 1)
+                builder.Append(",\r\n  ");
+            else 
+                builder.Append("\r\n  ");
+            i++;
+        }
+
+        return builder.ToString();
     }
 
     public async Task<Sample> GetSensorDataAsync()
     {
         Sample sample = new Sample();
-        var sensorResponse = await _httpClient.GetAsync(_httpClient.BaseAddress + SensorId);
-        SensorDTO sensor = await sensorResponse.Content.ReadFromJsonAsync<SensorDTO>();
+        var sensorResponse = await _httpClient.GetAsync(_sensorsUri + SensorId) ?? throw new ArgumentNullException("No such sensor.");
+        SensorDTO sensor = JsonSerializer.Deserialize<SensorDTO>(await sensorResponse.Content.ReadAsStringAsync());
         sample.Parameter = sensor.Parameter;
         sample.PhysicalQuantity = sensor.Current.Value;
 
