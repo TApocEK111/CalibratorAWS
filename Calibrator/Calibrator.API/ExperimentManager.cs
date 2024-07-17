@@ -19,7 +19,7 @@ public class ExperimentManager
     private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
     private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
     public bool IsActuatorReady { get; set; } = false;
-
+    public Report ResultReport {  get; set; } = new Report();
     public ExperimentManager(Context context)
     {
         _setpointRepository = new SetpointRepository(context);
@@ -36,8 +36,29 @@ public class ExperimentManager
     {
         if (_setpoint == null)
             throw new ArgumentNullException("Setpoint is null");
+        await PostSetpointDataAsync(_setpoint);
+        var actuator = await GetCurrentActuator();
+        double delay = (Math.Abs(actuator.Current.Value - _setpoint.Exposures[0].Value) / _setpoint.Exposures[0].Speed) * 1000;
+        await Task.Delay((int)delay);
+        while (!actuator.IsOnTarget)
+        {
+            await Task.Delay(50);
+            actuator = await GetCurrentActuator();
+        }
+        for (int i = 0; i < _setpoint.Exposures.Count; i++)
+        {
+            delay = (Math.Abs(_setpoint.Exposures[i].Value - _setpoint.Exposures[0].Value) / _setpoint.Exposures[0].Speed) * 1000;
+        } //короче, слишком много вопросов. не доделано.
+    }
 
-        var timer = new System.Timers.Timer();
+    private async Task<ActuatorDTO> GetCurrentActuator()
+    {
+        var response = await _httpClient.GetAsync(_actuatorsUri + ActuatorId) ?? throw new ArgumentNullException("No such actuator.");
+        var responseStr = await response.Content.ReadAsStringAsync();
+        var actuator = JsonSerializer.Deserialize<ActuatorDTO>(responseStr);
+
+        return actuator;
+
     }
 
     public async Task PostSetpointDataAsync(Setpoint setpoint)
@@ -102,4 +123,30 @@ public class ExperimentManager
         internal double Value { get; set; }
         internal string Unit { get; set; } 
     }
+
+    private class ActuatorDTO
+    {
+        internal PhysicalQuantityDTO Current { get; set; }
+        internal PhysicalQuantityDTO Target { get; set; }
+        internal bool IsOnTarget { get; set; }
+        internal List<PhysicalExposureDTO> Exposures { get; set; }
+        internal List<ExternalFactorDTO> ExternalFactors { get; set; }
+
+    }
+    private class PhysicalQuantityDTO
+    {
+        internal double Value { get; set; }
+        internal string Unit { get; set; }
+    }
+    private class PhysicalExposureDTO
+    {
+        double Value { get; set; }
+        double Duration { get; set; }
+        double Speed { get; set; }
+    }
+    private class ExternalFactorDTO
+    {
+        string Name { get; set; }
+    }
+
 }
