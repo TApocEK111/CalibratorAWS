@@ -8,7 +8,7 @@ public class Sensor
     public string Type { get; set; } = string.Empty;
     public string SerialNumber { get; set; } = string.Empty;
     public string SoftwareVersion { get; set; } = string.Empty;
-    public DateTime ManufactureDate { get { return _manufactureDate; } set { _manufactureDate = value.ToUniversalTime(); } } //biohazard
+    public DateTime ManufactureDate { get { return _manufactureDate; } set { _manufactureDate = value.ToUniversalTime(); } }
     public double EffectiveRangeMin {  get; set; }
     public double EffectiveRangeMax { get; set; }
 
