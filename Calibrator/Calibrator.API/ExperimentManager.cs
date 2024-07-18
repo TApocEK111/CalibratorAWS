@@ -19,7 +19,20 @@ public class ExperimentManager
     private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
     private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
     public bool IsActuatorReady { get; set; } = false;
-    public Report ResultReport {  get; set; } = new Report();
+    public Report ResultReport {  get; set; } = new Report
+    {
+        Sensors = new List<Sensor>
+        {
+            new Sensor()
+                {
+                    Channels = new List<SensorChannel>
+                    {
+                        new SensorChannel()
+                    }
+                }
+        }
+    };
+
     public ExperimentManager(Context context)
     {
         _setpointRepository = new SetpointRepository(context);
@@ -32,26 +45,40 @@ public class ExperimentManager
         _reportRepository = repRepo;
     }
 
-    public async Task Start()
+    public async Task CalibrationAsync()
     {
         if (_setpoint == null)
             throw new ArgumentNullException("Setpoint is null");
-        await PostSetpointDataAsync(_setpoint);
-        var actuator = await GetCurrentActuator();
-        double delay = (Math.Abs(actuator.Current.Value - _setpoint.Exposures[0].Value) / _setpoint.Exposures[0].Speed) * 1000;
-        await Task.Delay((int)delay);
-        while (!actuator.IsOnTarget)
-        {
-            await Task.Delay(50);
-            actuator = await GetCurrentActuator();
-        }
-        for (int i = 0; i < _setpoint.Exposures.Count; i++)
-        {
-            delay = (Math.Abs(_setpoint.Exposures[i].Value - _setpoint.Exposures[0].Value) / _setpoint.Exposures[0].Speed) * 1000;
-        } //короче, слишком много вопросов. не доделано.
+
+        ResultReport.Sensors[0].Channels[0].Samples = await GetSamplesAsync();
+        ResultReport.Sensors[0].Channels[0].DefineSamplesDirections();
+        ResultReport.Sensors[0].Channels[0].CalculateAverageSamples();
+        var calibrator = new Domain.Model.Calibrator.Calibrator();
+        calibrator.CalculatePhysicalQuantitylValues(ResultReport);
+        await PostSensorConfigAsync(ResultReport.Sensors[0].Channels[0].Coefficients);
     }
 
-    private async Task<ActuatorDTO> GetCurrentActuator()
+    public async Task<List<Sample>> GetSamplesAsync()
+    {
+        var samples = new List<Sample>(_setpoint.Exposures.Count);
+        foreach (var exposure in _setpoint.Exposures)
+        {
+            await PostExposureAsync(exposure);
+            var actuator = await GetCurrentActuatorAsync();
+            while (!actuator.isOnTarget)
+            {
+                await Task.Delay(250);
+                actuator = await GetCurrentActuatorAsync();
+            }
+
+            var sample = await GetSensorSampleAsync();
+            samples.Add(sample);
+        }
+
+        return samples;
+    }
+
+    private async Task<ActuatorDTO> GetCurrentActuatorAsync()
     {
         var response = await _httpClient.GetAsync(_actuatorsUri + ActuatorId) ?? throw new ArgumentNullException("No such actuator.");
         var responseStr = await response.Content.ReadAsStringAsync();
@@ -61,7 +88,7 @@ public class ExperimentManager
 
     }
 
-    public async Task PostSetpointDataAsync(Setpoint setpoint)
+    public async Task PostExposureAsync(Exposure exposure)
     {
         await _httpClient.PostAsync(_actuatorsUri + ActuatorId, new StringContent($"" +
             $"{{\r\n  " +
@@ -70,83 +97,73 @@ public class ExperimentManager
                     $"\"unit\": \"string\"\r\n  " +
                 $"}},\r\n  " +
                 $"\"targetQuantity\": {{\r\n    " +
-                    $"\"value\": {setpoint.Exposures[setpoint.Exposures.Count - 1].Value},\r\n    " +
+                    $"\"value\": {exposure.Value},\r\n    " +
                     $"\"unit\": \"string\"\r\n  " +
                 $"}},\r\n  " +
                 $"\"exposures\": [\r\n    " +
-                    ExposuresToJsonList(setpoint) +
+                $"{{\r\n      \"value\": {exposure.Value},\r\n      \"duration\": {exposure.Duration},\r\n      \"speed\": {exposure.Speed}\r\n    }}" +
                 $"]\r\n}}"));
     }
 
-    private string ExposuresToJsonList(Setpoint setpoint)
+    public async Task<bool> PostSensorConfigAsync(Coefficients coef)
     {
-        var builder = new StringBuilder();
-        int i = 0;
-        foreach (var exposure in setpoint.Exposures)
-        {
-            builder.Append($"{{\r\n      \"value\": {exposure.Value},\r\n      \"duration\": {exposure.Duration},\r\n      \"speed\": {exposure.Speed}\r\n    }}");
-            if (i < setpoint.Exposures.Count - 1)
-                builder.Append(",\r\n  ");
-            else 
-                builder.Append("\r\n  ");
-            i++;
-        }
+        var response = await _httpClient.PostAsync(_sensorsUri + SensorId + "/config", new StringContent($"{{\r\n  \"staticFunctionConfig\": {{\r\n    \"type\": \"string\",\r\n    \"coefficients\": [\r\n      {coef.C},\r\n      {coef.B},\r\n      {coef.A}\r\n    ]\r\n }}\r\n}}"));
+        return response.IsSuccessStatusCode;
+    }   
 
-        return builder.ToString();
-    }
+    public async Task<Sample> GetSensorSampleAsync()
 
-    public async Task<Sample> GetSensorDataAsync()
     {
         Sample sample = new Sample();
         var sensorResponse = await _httpClient.GetAsync(_sensorsUri + SensorId) ?? throw new ArgumentNullException("No such sensor.");
         SensorDTO sensor = JsonSerializer.Deserialize<SensorDTO>(await sensorResponse.Content.ReadAsStringAsync());
-        sample.Parameter = sensor.Parameter;
-        sample.PhysicalQuantity = sensor.Current.Value;
+        sample.Parameter = sensor.parameter;
+        sample.PhysicalQuantity = sensor.current.value;
 
         return sample;
     }
 
-    public async Task SetSetpoint(Guid id) => _setpoint = await _setpointRepository.GetByIdAsync(id);
+    public async Task SetSetpointAsync(Guid id) => _setpoint = await _setpointRepository.GetByIdAsync(id);
 
-    public async Task SetSetpoint(string name) => _setpoint = await _setpointRepository.GetByNameAsync(name);
+    public async Task SetSetpointAsync(string name) => _setpoint = await _setpointRepository.GetByNameAsync(name);
 
     public void SetSetpoint(Setpoint setpoint) => _setpoint = setpoint;
 
-    private class SensorDTO
+    public class SensorDTO
     {
-        internal CurrentDTO Current { get; set; }
-        internal double Parameter { get; set; }
+        public CurrentDTO current { get; set; }
+        public double parameter { get; set; }
     }
-    private struct CurrentDTO
+    public struct CurrentDTO
     {
-        internal string Id { get; set; }
-        internal double Value { get; set; }
-        internal string Unit { get; set; } 
+        public string id { get; set; }
+        public double value { get; set; }
+        public string unit { get; set; } 
     }
 
-    private class ActuatorDTO
+    public class ActuatorDTO
     {
-        internal PhysicalQuantityDTO Current { get; set; }
-        internal PhysicalQuantityDTO Target { get; set; }
-        internal bool IsOnTarget { get; set; }
-        internal List<PhysicalExposureDTO> Exposures { get; set; }
-        internal List<ExternalFactorDTO> ExternalFactors { get; set; }
+        public PhysicalQuantityDTO current { get; set; }
+        public PhysicalQuantityDTO target { get; set; }
+        public bool isOnTarget { get; set; }
+        public List<PhysicalExposureDTO> exposures { get; set; }
+        public List<ExternalFactorDTO> externalFactors { get; set; }
 
     }
-    private class PhysicalQuantityDTO
+    public class PhysicalQuantityDTO
     {
-        internal double Value { get; set; }
-        internal string Unit { get; set; }
+        public double value { get; set; }
+        public string unit { get; set; }
     }
-    private class PhysicalExposureDTO
+    public class PhysicalExposureDTO
     {
-        double Value { get; set; }
-        double Duration { get; set; }
-        double Speed { get; set; }
+        double value { get; set; }
+        double duration { get; set; }
+        double speed { get; set; }
     }
-    private class ExternalFactorDTO
+    public class ExternalFactorDTO
     {
-        string Name { get; set; }
+        string name { get; set; }
     }
 
 }
