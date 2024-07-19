@@ -13,8 +13,8 @@ public class ExperimentManager
     private Setpoint _setpoint;
     private SetpointRepository _setpointRepository;
     private ReportRepository _reportRepository;
-    public string ActuatorId { get; private set; }
-    public string SensorId { get; private set; }
+    public string ActuatorId { get; set; }
+    public string SensorId { get; set; }
     private HttpClient _httpClient = new HttpClient();
     private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
     private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
@@ -50,12 +50,27 @@ public class ExperimentManager
         if (_setpoint == null)
             throw new ArgumentNullException("Setpoint is null");
 
+        var calibrator = new Domain.Model.Calibrator.Calibrator();
         ResultReport.Sensors[0].Channels[0].Samples = await GetSamplesAsync();
         ResultReport.Sensors[0].Channels[0].DefineSamplesDirections();
         ResultReport.Sensors[0].Channels[0].CalculateAverageSamples();
-        var calibrator = new Domain.Model.Calibrator.Calibrator();
         calibrator.CalculatePhysicalQuantitylValues(ResultReport);
         await PostSensorConfigAsync(ResultReport.Sensors[0].Channels[0].Coefficients);
+
+        ResultReport.Sensors[0].Channels[0].Samples = await GetSamplesAsync();
+        foreach (var sample in ResultReport.Sensors[0].Channels[0].Samples)
+        {
+            if (!IsInBounds(sample.ReferenceValue, sample.PhysicalQuantity, 0.05))
+            {
+                throw new ArgumentOutOfRangeException("Error is too big.");
+            }
+        }
+
+        ResultReport.Sensors[0].Channels[0].DefineSamplesDirections();
+        ResultReport.Sensors[0].Channels[0].CalculateAverageSamples();
+        ResultReport.Sensors[0].Channels[0].DefineMaxError();
+        calibrator.CalculatePhysicalQuantitylValues(ResultReport);
+        await _reportRepository.AddAsync(ResultReport);
     }
 
     public async Task<List<Sample>> GetSamplesAsync()
@@ -72,13 +87,14 @@ public class ExperimentManager
             }
 
             var sample = await GetSensorSampleAsync();
+            sample.ReferenceValue = exposure.Value;
             samples.Add(sample);
         }
 
         return samples;
     }
 
-    private async Task<ActuatorDTO> GetCurrentActuatorAsync()
+    public async Task<ActuatorDTO> GetCurrentActuatorAsync()
     {
         var response = await _httpClient.GetAsync(_actuatorsUri + ActuatorId) ?? throw new ArgumentNullException("No such actuator.");
         var responseStr = await response.Content.ReadAsStringAsync();
@@ -88,21 +104,10 @@ public class ExperimentManager
 
     }
 
-    public async Task PostExposureAsync(Exposure exposure)
+    public async Task<ActuatorDTO> PostExposureAsync(Exposure exposure)
     {
-        await _httpClient.PostAsync(_actuatorsUri + ActuatorId, new StringContent($"" +
-            $"{{\r\n  " +
-                $"\"currentQuantity\": {{\r\n    " +
-                    $"\"value\": 0,\r\n    " +
-                    $"\"unit\": \"string\"\r\n  " +
-                $"}},\r\n  " +
-                $"\"targetQuantity\": {{\r\n    " +
-                    $"\"value\": {exposure.Value},\r\n    " +
-                    $"\"unit\": \"string\"\r\n  " +
-                $"}},\r\n  " +
-                $"\"exposures\": [\r\n    " +
-                $"{{\r\n      \"value\": {exposure.Value},\r\n      \"duration\": {exposure.Duration},\r\n      \"speed\": {exposure.Speed}\r\n    }}" +
-                $"]\r\n}}"));
+        var response = await _httpClient.PostAsync(_actuatorsUri + ActuatorId, new StringContent($"{{  \"currentQuantity\": {{    \"value\": 0,    \"unit\": \"string\"  }},  \"targetQuantity\": {{    \"value\": {exposure.Value},    \"unit\": \"string\"  }},  \"exposures\": [    {{      \"value\": {exposure.Value},      \"duration\": {exposure.Duration},      \"speed\": {exposure.Speed}    }}  ]}}", Encoding.UTF8, "application/json"));
+        return JsonSerializer.Deserialize<ActuatorDTO>(await response.Content.ReadAsStringAsync());
     }
 
     public async Task<bool> PostSensorConfigAsync(Coefficients coef)
@@ -121,6 +126,13 @@ public class ExperimentManager
         sample.PhysicalQuantity = sensor.current.value;
 
         return sample;
+    }
+
+    private bool IsInBounds(double expected, double arg, double error)
+    {
+        if (arg * expected < 0)
+            return false;
+        return Math.Abs(arg) >= Math.Abs(expected - expected * error) && Math.Abs(arg) <= Math.Abs(expected + expected * error);
     }
 
     public async Task SetSetpointAsync(Guid id) => _setpoint = await _setpointRepository.GetByIdAsync(id);

@@ -4,12 +4,15 @@ public class SensorChannel
 {
     public Guid Id { get; set; }
     public int Number { get; set; }
+    public double MaxError { get; set; }
     public List<Sample> Samples { get; set; } = new List<Sample>();
     public List<AverageSample> AverageSamples { get; set; } = null!;
     public Coefficients Coefficients { get; set; }
     public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
 
     public Sensor Sensor { get; set; }
+
+    public void DefineMaxError() => MaxError = Samples.MaxBy(s => s.Error).Error;
 
     public void DefineSamplesDirections()
     {
