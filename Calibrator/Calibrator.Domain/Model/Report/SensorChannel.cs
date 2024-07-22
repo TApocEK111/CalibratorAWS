@@ -1,4 +1,6 @@
-﻿namespace Calibrator.Domain.Model.Report;
+﻿using System.Text.Json.Serialization;
+
+namespace Calibrator.Domain.Model.Report;
 
 public class SensorChannel
 {
@@ -10,6 +12,7 @@ public class SensorChannel
     public Coefficients Coefficients { get; set; }
     public PhysicalQuantity PhisicalQuantity { get; set; } = PhysicalQuantity.Udefined;
 
+    [JsonIgnore]
     public Sensor Sensor { get; set; }
 
     public void DefineMaxError() => MaxError = Samples.MaxBy(s => s.Error).Error;

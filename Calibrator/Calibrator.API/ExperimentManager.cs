@@ -18,20 +18,7 @@ public class ExperimentManager
     private HttpClient _httpClient = new HttpClient();
     private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
     private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
-    public bool IsActuatorReady { get; set; } = false;
-    public Report ResultReport {  get; set; } = new Report
-    {
-        Sensors = new List<Sensor>
-        {
-            new Sensor()
-                {
-                    Channels = new List<SensorChannel>
-                    {
-                        new SensorChannel()
-                    }
-                }
-        }
-    };
+    public Report ResultReport { get; set; }
 
     public ExperimentManager(Context context)
     {

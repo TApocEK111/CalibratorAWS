@@ -1,4 +1,6 @@
-﻿namespace Calibrator.Domain.Model.Setpoint;
+﻿using System.Text.Json.Serialization;
+
+namespace Calibrator.Domain.Model.Setpoint;
 
 public class Exposure
 {
@@ -9,5 +11,6 @@ public class Exposure
     public double Speed { get; set; }
     public double Duration { get; set; }
 
+    [JsonIgnore]
     public Setpoint Setpoint { get; set; }
 }

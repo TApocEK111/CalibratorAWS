@@ -1,4 +1,6 @@
-﻿namespace Calibrator.Domain.Model.Report;
+﻿using System.Text.Json.Serialization;
+
+namespace Calibrator.Domain.Model.Report;
 
 public class Sample
 {
@@ -13,6 +15,7 @@ public class Sample
     public List<ExternalImpact> ExternalImpacts { get; set; } = new List<ExternalImpact>();
     public Direction Direction { get; set; } = Direction.Undefined;
 
+    [JsonIgnore]
     public SensorChannel Channel { get; set; }
 }
 public enum Direction

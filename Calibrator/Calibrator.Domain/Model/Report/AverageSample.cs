@@ -1,4 +1,6 @@
-﻿namespace Calibrator.Domain.Model.Report;
+﻿using System.Text.Json.Serialization;
+
+namespace Calibrator.Domain.Model.Report;
 
 public class AverageSample
 {
@@ -7,5 +9,6 @@ public class AverageSample
     public double Parameter { get; set; }
     public double PhysicalQuantity { get; set; }
 
+    [JsonIgnore]
     public SensorChannel Channel { get; set; }
 }

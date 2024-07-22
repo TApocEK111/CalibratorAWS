@@ -1,4 +1,6 @@
-﻿namespace Calibrator.Domain.Model.Report;
+﻿using System.Text.Json.Serialization;
+
+namespace Calibrator.Domain.Model.Report;
 
 public class Sensor
 {
@@ -11,8 +13,8 @@ public class Sensor
     public DateTime ManufactureDate { get { return _manufactureDate; } set { _manufactureDate = value.ToUniversalTime(); } }
     public double EffectiveRangeMin {  get; set; }
     public double EffectiveRangeMax { get; set; }
-
     public List<SensorChannel> Channels { get; set; } = new List<SensorChannel>();
-
+    
+    [JsonIgnore]
     public Report Report { get; set; }
 }
