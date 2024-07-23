@@ -1,7 +1,7 @@
 ﻿using Calibrator.Domain.Model.Report;
 using Calibrator.Domain.Model.Setpoint;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+using Calibrator.Infrastructure.Repository;
 
 namespace Calibrator.API.Controllers
 {
@@ -10,14 +10,18 @@ namespace Calibrator.API.Controllers
     public class CalibratorController : Controller
     {
         private ManagersContainer _container;
+        private SetpointRepository _setRepo;
+        private ReportRepository _reportRepo;
 
-        public CalibratorController(ManagersContainer container)
+        public CalibratorController(ManagersContainer container, SetpointRepository setRepo, ReportRepository reportRepo)
         {
             _container = container;
+            _setRepo = setRepo;
+            _reportRepo = reportRepo;
         }
 
         [HttpPost]
-        public IActionResult Calibration([FromBody] StartCalibrationRequestModel startCalibrationRequestModel)
+        public async Task<IActionResult> Calibration([FromBody] StartCalibrationRequestModel startCalibrationRequestModel)
         {
             var report = new Report();
             var manager = _container.GetManagerById(new Guid(startCalibrationRequestModel.userInfo.Id));
@@ -37,32 +41,31 @@ namespace Calibrator.API.Controllers
                 PhisicalQuantity = (PhysicalQuantity)startCalibrationRequestModel.PhysicalQuantityType
             });
             manager.ResultReport = report;
-            manager.SetSetpoint(new Setpoint()
-            {
-                Id = new Guid(startCalibrationRequestModel.setpointInfo.Id),
-                Name = startCalibrationRequestModel.setpointInfo.Name,
-                Exposures = startCalibrationRequestModel.setpointInfo.Exposures
-            });
-            var calibration = manager.CalibrationAsync();
-            Task.WaitAll(calibration);
+            manager.SetSetpoint(await _setRepo.GetByIdAsync(startCalibrationRequestModel.setpointId));
+            manager.CalibrationTask = manager.CalibrationAsync();
 
+            return Ok(report.Id);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReport(Guid reportId)
+        {
+            Report report = await _reportRepo.GetByIdAsync(reportId);
             return Ok(report);
         }
 
-
+        [HttpGet]
+        public IActionResult GetCurrentStatus(Guid userId)
+        {
+            return Ok(_container.GetManagerById(userId).CalibrationTask.Status);
+        }
 
         public class StartCalibrationRequestModel
         {
             public UserInfoModel userInfo { get; set; }
             public SensorInfoModel sensorInfo { get; set; }
-            public SetpointInfoModel setpointInfo { get; set; }
+            public Guid setpointId { get; set; }
             public int PhysicalQuantityType { get; set; }
-        }
-        public class SetpointInfoModel
-        {
-            public string Name { get; set; }
-            public string Id { get; set; }
-            public List<Exposure> Exposures { get; set; }
         }
         public class UserInfoModel
         {

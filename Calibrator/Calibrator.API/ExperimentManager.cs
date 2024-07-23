@@ -19,6 +19,8 @@ public class ExperimentManager
     private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
     private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
     public Report ResultReport { get; set; }
+    private Exposure _previous { get; set; } = new Exposure() { Value = 0 };
+    public Task CalibrationTask { get; set; }
 
     public ExperimentManager(Context context)
     {
@@ -93,13 +95,14 @@ public class ExperimentManager
 
     public async Task<ActuatorDTO> PostExposureAsync(Exposure exposure)
     {
-        var response = await _httpClient.PostAsync(_actuatorsUri + ActuatorId, new StringContent($"{{  \"currentQuantity\": {{    \"value\": 0,    \"unit\": \"string\"  }},  \"targetQuantity\": {{    \"value\": {exposure.Value},    \"unit\": \"string\"  }},  \"exposures\": [    {{      \"value\": {exposure.Value},      \"duration\": {exposure.Duration},      \"speed\": {exposure.Speed}    }}  ]}}", Encoding.UTF8, "application/json"));
+        var response = await _httpClient.PostAsync(_actuatorsUri + ActuatorId, new StringContent($"{{  \"currentQuantity\": {{    \"value\": {_previous.Value},    \"unit\": \"string\"  }},  \"targetQuantity\": {{    \"value\": {exposure.Value},    \"unit\": \"string\"  }},  \"exposures\": [    {{      \"value\": {exposure.Value},      \"duration\": {exposure.Duration},      \"speed\": {exposure.Speed}    }}  ]}}", Encoding.UTF8, "application/json"));
+        _previous = exposure;
         return JsonSerializer.Deserialize<ActuatorDTO>(await response.Content.ReadAsStringAsync());
     }
 
     public async Task<bool> PostSensorConfigAsync(Coefficients coef)
     {
-        var response = await _httpClient.PostAsync(_sensorsUri + SensorId + "/config", new StringContent($"{{\r\n  \"staticFunctionConfig\": {{\r\n    \"type\": \"string\",\r\n    \"coefficients\": [\r\n      {coef.C},\r\n      {coef.B},\r\n      {coef.A}\r\n    ]\r\n }}\r\n}}"));
+        var response = await _httpClient.PostAsync(_sensorsUri + SensorId + "/config", new StringContent($"{{\r\n  \"staticFunctionCoefficients\": [\r\n    5,\r\n    2,\r\n    0.1,\r\n    0.05\r\n  ],\r\n  \"approximateCoefficients\": [\r\n    {coef.C},\r\n    {coef.B},\r\n    {coef.A}\r\n  ]\r\n}}"));
         return response.IsSuccessStatusCode;
     }   
 
