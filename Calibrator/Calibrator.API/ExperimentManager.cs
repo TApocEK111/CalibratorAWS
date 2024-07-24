@@ -95,14 +95,22 @@ public class ExperimentManager
 
     public async Task<ActuatorDTO> PostExposureAsync(Exposure exposure)
     {
-        var response = await _httpClient.PostAsync(_actuatorsUri + ActuatorId, new StringContent($"{{  \"currentQuantity\": {{    \"value\": {_previous.Value},    \"unit\": \"string\"  }},  \"targetQuantity\": {{    \"value\": {exposure.Value},    \"unit\": \"string\"  }},  \"exposures\": [    {{      \"value\": {exposure.Value},      \"duration\": {exposure.Duration},      \"speed\": {exposure.Speed}    }}  ]}}", Encoding.UTF8, "application/json"));
+        var payload = new PostExposureDTO();
+        payload.currentQuantity.value = _previous.Value;
+        payload.targetQuantity.value = exposure.Value;
+        payload.exposures.Add(new ExposureDTO { value = exposure.Value, duration = exposure.Duration, speed = exposure.Speed });
+
+        var response = await _httpClient.PostAsJsonAsync(_actuatorsUri + ActuatorId, payload);
         _previous = exposure;
         return JsonSerializer.Deserialize<ActuatorDTO>(await response.Content.ReadAsStringAsync());
     }
 
     public async Task<bool> PostSensorConfigAsync(Coefficients coef)
     {
-        var response = await _httpClient.PostAsync(_sensorsUri + SensorId + "/config", new StringContent($"{{\r\n  \"staticFunctionCoefficients\": [\r\n    5,\r\n 2,\r\n 0.05,\r\n 0.002\r\n  ],\r\n  \"approximateCoefficients\": [\r\n    {coef.C},\r\n{coef.B},\r\n{coef.A}\r\n  ]\r\n}}", Encoding.UTF8, "application/json"));
+        var payload = new PostSensorConfigDTO();
+        payload.approximateCoefficients = [coef.C, coef.B, coef.A];
+
+        var response = await _httpClient.PostAsJsonAsync(_sensorsUri + SensorId + "/config", payload);
         return response.IsSuccessStatusCode;
     }   
 
@@ -169,4 +177,32 @@ public class ExperimentManager
         string name { get; set; }
     }
 
+    public class PostSensorConfigDTO
+    {
+        public double[] staticFunctionCoefficients { get; set; } = [5, 2, 0.05, 0.002];
+        public double[] approximateCoefficients { get; set; }
+    }
+
+    public class PostExposureDTO
+    {
+        public CurrentQuantityDTO currentQuantity { get; set; } = new();
+        public TargetQuantityDTO targetQuantity { get; set; } = new();
+        public List<ExposureDTO> exposures { get; set; } = new List<ExposureDTO>();
+    }
+    public class CurrentQuantityDTO
+    {
+        public double value { get; set; }
+        public string unit { get; set; } = "string";
+    }
+    public class TargetQuantityDTO
+    {
+        public double value { get; set; }
+        public string unit { get; set; } = "string";
+    }
+    public class ExposureDTO
+    {
+        public double value { get; set; }
+        public double duration { get; set; }
+        public double speed { get; set; }
+    }
 }
