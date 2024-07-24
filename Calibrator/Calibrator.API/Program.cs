@@ -16,9 +16,9 @@ namespace Calibrator.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<Infrastructure.Data.Context>();
+            builder.Services.AddDbContext<Infrastructure.Data.Context>(ServiceLifetime.Singleton);
 
-            builder.Services.AddSingleton<ExperimentManager>();
+            builder.Services.AddSingleton<ManagersContainer>();
 
             var app = builder.Build();
 

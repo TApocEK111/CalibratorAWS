@@ -5,7 +5,7 @@ using Calibrator.Infrastructure.Repository;
 
 namespace Calibrator.API.Controllers
 {
-    [Route("api/calibrator")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CalibratorController : Controller
     {
@@ -47,14 +47,14 @@ namespace Calibrator.API.Controllers
             return Ok(report.Id);
         }
 
-        [HttpGet]
+        [HttpGet("{reportId}")]
         public async Task<IActionResult> GetReport(Guid reportId)
         {
             Report report = await _reportRepo.GetByIdAsync(reportId);
             return Ok(report);
         }
 
-        [HttpGet]
+        [HttpGet("{userId}/status")]
         public IActionResult GetCurrentStatus(Guid userId)
         {
             return Ok(_container.GetManagerById(userId).CalibrationTask.Status);

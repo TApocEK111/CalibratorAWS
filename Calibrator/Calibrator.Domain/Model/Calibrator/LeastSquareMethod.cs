@@ -42,8 +42,8 @@ public static class LeastSquareMethod
         int i = 0;
         foreach (var sample in channel.AverageSamples)
         {
-            X[i] = sample.ReferenceValue;
-            Y[i] = sample.Parameter;
+            Y[i] = sample.ReferenceValue;
+            X[i] = sample.Parameter;
             i++;
         }
 

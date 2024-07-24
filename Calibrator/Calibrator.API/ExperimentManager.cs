@@ -102,7 +102,7 @@ public class ExperimentManager
 
     public async Task<bool> PostSensorConfigAsync(Coefficients coef)
     {
-        var response = await _httpClient.PostAsync(_sensorsUri + SensorId + "/config", new StringContent($"{{\r\n  \"staticFunctionCoefficients\": [\r\n    5,\r\n    2,\r\n    0.1,\r\n    0.05\r\n  ],\r\n  \"approximateCoefficients\": [\r\n    {coef.C},\r\n    {coef.B},\r\n    {coef.A}\r\n  ]\r\n}}"));
+        var response = await _httpClient.PostAsync(_sensorsUri + SensorId + "/config", new StringContent($"{{\r\n  \"staticFunctionCoefficients\": [\r\n    5,\r\n 2,\r\n 0.05,\r\n 0.002\r\n  ],\r\n  \"approximateCoefficients\": [\r\n    {coef.C},\r\n{coef.B},\r\n{coef.A}\r\n  ]\r\n}}", Encoding.UTF8, "application/json"));
         return response.IsSuccessStatusCode;
     }   
 
@@ -113,7 +113,7 @@ public class ExperimentManager
         var sensorResponse = await _httpClient.GetAsync(_sensorsUri + SensorId) ?? throw new ArgumentNullException("No such sensor.");
         SensorDTO sensor = JsonSerializer.Deserialize<SensorDTO>(await sensorResponse.Content.ReadAsStringAsync());
         sample.Parameter = sensor.parameter;
-        sample.PhysicalQuantity = sensor.current.value;
+        sample.PhysicalQuantity = sensor.approximatedValue;
 
         return sample;
     }
@@ -135,6 +135,7 @@ public class ExperimentManager
     {
         public CurrentDTO current { get; set; }
         public double parameter { get; set; }
+        public double approximatedValue { get; set; }
     }
     public struct CurrentDTO
     {

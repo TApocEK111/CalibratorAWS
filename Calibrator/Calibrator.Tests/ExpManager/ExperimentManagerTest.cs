@@ -14,8 +14,8 @@ public class ExperimentManagerTest
         ExperimentManager manager = new ExperimentManager(new Context(new DbContextOptionsBuilder<Context>()
             .UseNpgsql("Host=localhost;Port=5432;Database=TestReportDB;Username=postgres;Password=admin")
             .Options));
-        manager.ActuatorId = "2";
-        manager.SensorId = "2";
+        manager.ActuatorId = "1";
+        manager.SensorId = "1";
 
         //await manager.PostSensorConfigAsync(new Coefficients { A = 1, B = 2, C = 3 });
         Setpoint setpoint = new Setpoint { Exposures = exposures, Id = Guid.NewGuid(), Name = "123" };
@@ -35,7 +35,7 @@ public class ExperimentManagerTest
         manager.SetSetpoint(setpoint);
         await manager.CalibrationAsync();
         HttpClient client = new HttpClient();
-        var response = await client.GetAsync("https://sensorsim.socketsomeone.me/api/sensors/" + manager.SensorId + "config");
+        var response = await client.GetAsync("https://sensorsim.socketsomeone.me/api/sensors/" + manager.SensorId + "/config");
         Assert.NotNull(response);
         //var actuator = await manager.PostExposureAsync(exposure);
         //Assert.True(actuator.isOnTarget == false);

@@ -7,6 +7,7 @@ public class LSMTests
     [InlineData(new double[] { 0.192926, -3.2684, 14.2907 }, new double[] { 10.1, 1.2, 12.6, 2.8, 14.8, 7.6, 16, 12.8, 17.5, 15.1 })]
     [InlineData(new double[] { 0, 1, 0 }, new double[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 })]
     [InlineData(new double[] { 0, 1, 1 }, new double[] { 1, 2, 2, 3, 3, 4, 4, 5, 5, 6 })]
+    [InlineData(new double[] { 0.097326, 1.78856, 4.38732 }, new double[] { 5, 16.03, 11, 34.86, 16, 59.12, 20, 78.6 })]
     public void CalculatesCorrectCoefficients(double[] expected, double[] args)
     {
         SensorChannel channel = new SensorChannel()
