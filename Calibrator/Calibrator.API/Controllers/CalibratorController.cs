@@ -75,7 +75,7 @@ namespace Calibrator.API.Controllers
         [HttpGet("{userId}/status")]
         public IActionResult GetCurrentStatus(Guid userId)
         {
-            return Ok(_container.GetManagerById(userId).CalibrationTask.Status);
+            return Ok(_container.GetManagerById(userId).Status);
         }
 
         public class StartCalibrationRequestModel

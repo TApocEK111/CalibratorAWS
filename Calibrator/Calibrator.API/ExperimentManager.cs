@@ -10,6 +10,7 @@ namespace Calibrator.API;
 
 public class ExperimentManager
 {
+    public CalibrationStatus Status { get; set; }
     private Setpoint _setpoint;
     private SetpointRepository _setpointRepository;
     private ReportRepository _reportRepository;
@@ -22,6 +23,15 @@ public class ExperimentManager
     private Exposure _previous { get; set; } = new Exposure() { Value = 0 };
     public Task CalibrationTask { get; set; }
 
+    public enum CalibrationStatus
+    {
+        Inactive,
+        GettingInitialSensorData,
+        Calibrating,
+        GettingCalibratedSensorData,
+        AddingToDb,
+        Finished
+    }
     public ExperimentManager(Context context)
     {
         _setpointRepository = new SetpointRepository(context);
@@ -36,16 +46,20 @@ public class ExperimentManager
 
     public async Task CalibrationAsync()
     {
+        Status = CalibrationStatus.Inactive;
         if (_setpoint == null)
             throw new ArgumentNullException("Setpoint is null");
 
         var calibrator = new Domain.Model.Calibrator.Calibrator();
+        Status = CalibrationStatus.GettingInitialSensorData;
         ResultReport.Sensors[0].Channels[0].Samples = await GetSamplesAsync();
+        Status = CalibrationStatus.Calibrating;
         ResultReport.Sensors[0].Channels[0].DefineSamplesDirections();
         ResultReport.Sensors[0].Channels[0].CalculateAverageSamples();
         calibrator.CalculatePhysicalQuantitylValues(ResultReport);
         await PostSensorConfigAsync(ResultReport.Sensors[0].Channels[0].Coefficients);
 
+        Status = CalibrationStatus.GettingCalibratedSensorData;
         ResultReport.Sensors[0].Channels[0].Samples = await GetSamplesAsync();
         foreach (var sample in ResultReport.Sensors[0].Channels[0].Samples)
         {
@@ -54,12 +68,13 @@ public class ExperimentManager
                 throw new ArgumentOutOfRangeException("Error is too big.");
             }
         }
-
         ResultReport.Sensors[0].Channels[0].DefineSamplesDirections();
         ResultReport.Sensors[0].Channels[0].CalculateAverageSamples();
         ResultReport.Sensors[0].Channels[0].DefineMaxError();
-        calibrator.CalculatePhysicalQuantitylValues(ResultReport);
+        //calibrator.CalculatePhysicalQuantitylValues(ResultReport);
+        Status = CalibrationStatus.AddingToDb;
         await _reportRepository.AddAsync(ResultReport);
+        Status = CalibrationStatus.Finished;
     }
 
     public async Task<List<Sample>> GetSamplesAsync()
