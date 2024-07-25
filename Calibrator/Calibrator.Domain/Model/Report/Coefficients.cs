@@ -4,10 +4,11 @@ namespace Calibrator.Domain.Model.Report;
 
 public class Coefficients
 {
+    public Guid CoefficientsId { get; set; }
     public double A { get; set; }
     public double B { get; set; }
     public double C { get; set; }
 
     [JsonIgnore]
-    public SensorChannel Channel { get; set; }
+    public Guid SensorChannelId { get; set; }
 }

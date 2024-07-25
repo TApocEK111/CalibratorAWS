@@ -1,4 +1,5 @@
 
+using Calibrator.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Calibrator.API
@@ -19,6 +20,8 @@ namespace Calibrator.API
             builder.Services.AddDbContext<Infrastructure.Data.Context>(ServiceLifetime.Singleton);
 
             builder.Services.AddSingleton<ManagersContainer>();
+            builder.Services.AddSingleton<SetpointRepository>();
+            builder.Services.AddSingleton<ReportRepository>();
 
             var app = builder.Build();
 

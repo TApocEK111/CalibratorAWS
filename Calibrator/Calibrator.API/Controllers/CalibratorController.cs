@@ -25,6 +25,8 @@ namespace Calibrator.API.Controllers
         {
             var report = new Report();
             var manager = _container.GetManagerById(new Guid(startCalibrationRequestModel.userInfo.Id));
+            manager.SensorId = startCalibrationRequestModel.sensorId;
+            manager.ActuatorId = startCalibrationRequestModel.actuatorId;
 
             report.Sensors.Add(new Sensor()
             {
@@ -41,10 +43,26 @@ namespace Calibrator.API.Controllers
                 PhisicalQuantity = (PhysicalQuantity)startCalibrationRequestModel.PhysicalQuantityType
             });
             manager.ResultReport = report;
-            manager.SetSetpoint(await _setRepo.GetByIdAsync(startCalibrationRequestModel.setpointId));
+            var setpoint = await _setRepo.GetByIdAsync(startCalibrationRequestModel.setpointId);
+            manager.SetSetpoint(setpoint);
+            report.SetpointId = setpoint.Id;
             manager.CalibrationTask = manager.CalibrationAsync();
 
             return Ok(report.Id);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Setpoint>> SetSetpoint(Setpoint setpoint)
+        {
+            await _setRepo.AddAsync(setpoint);
+            return Ok();
+        }
+
+        [HttpGet("{setpointId}/setpoint")]
+        public async Task<ActionResult<Setpoint>> GetSetpoint(Guid setpointId)
+        {
+            var setpoint = await _setRepo.GetByIdAsync(setpointId);
+            return setpoint;
         }
 
         [HttpGet("{reportId}")]
@@ -65,6 +83,8 @@ namespace Calibrator.API.Controllers
             public UserInfoModel userInfo { get; set; }
             public SensorInfoModel sensorInfo { get; set; }
             public Guid setpointId { get; set; }
+            public string sensorId { get; set; }
+            public string actuatorId { get; set; }
             public int PhysicalQuantityType { get; set; }
         }
         public class UserInfoModel
@@ -81,5 +101,6 @@ namespace Calibrator.API.Controllers
             public double EffectiveRangeMin { get; set; }
             public double EffectiveRangeMax { get; set; }
         }
+
     }
 }

@@ -28,6 +28,9 @@ namespace Calibrator.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("uuid");
+
                     b.Property<double>("Parameter")
                         .HasColumnType("double precision");
 
@@ -37,14 +40,37 @@ namespace Calibrator.Infrastructure.Migrations
                     b.Property<double>("ReferenceValue")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid?>("SensorChannelId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("SensorChannelId");
+                    b.HasIndex("ChannelId");
 
                     b.ToTable("AverageSamples");
+                });
+
+            modelBuilder.Entity("Calibrator.Domain.Model.Report.Coefficients", b =>
+                {
+                    b.Property<Guid>("CoefficientsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("A")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("B")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("C")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("SensorChannelId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CoefficientsId");
+
+                    b.HasIndex("SensorChannelId")
+                        .IsUnique();
+
+                    b.ToTable("Coefficients");
                 });
 
             modelBuilder.Entity("Calibrator.Domain.Model.Report.ExternalImpact", b =>
@@ -56,7 +82,7 @@ namespace Calibrator.Infrastructure.Migrations
                     b.Property<int>("PhisicalQuantity")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("SampleId")
+                    b.Property<Guid>("SampleId")
                         .HasColumnType("uuid");
 
                     b.Property<double>("Value")
@@ -82,6 +108,9 @@ namespace Calibrator.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("SetpointId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.ToTable("Reports");
@@ -91,6 +120,9 @@ namespace Calibrator.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChannelId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Direction")
@@ -108,12 +140,9 @@ namespace Calibrator.Infrastructure.Migrations
                     b.Property<double>("ReferenceValue")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid?>("SensorChannelId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("SensorChannelId");
+                    b.HasIndex("ChannelId");
 
                     b.ToTable("Samples");
                 });
@@ -130,10 +159,10 @@ namespace Calibrator.Infrastructure.Migrations
                     b.Property<double>("EffectiveRangeMin")
                         .HasColumnType("double precision");
 
-                    b.Property<DateTime?>("ManufactureDate")
+                    b.Property<DateTime>("ManufactureDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("ReportId")
+                    b.Property<Guid>("ReportId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("SerialNumber")
@@ -161,10 +190,16 @@ namespace Calibrator.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<double>("MaxError")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("integer");
+
                     b.Property<int>("PhisicalQuantity")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("SensorId")
+                    b.Property<Guid>("SensorId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -174,39 +209,122 @@ namespace Calibrator.Infrastructure.Migrations
                     b.ToTable("SensorChannels");
                 });
 
+            modelBuilder.Entity("Calibrator.Domain.Model.Setpoint.Exposure", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("Duration")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SetpointId")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("Speed")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SetpointId");
+
+                    b.ToTable("Exposures");
+                });
+
+            modelBuilder.Entity("Calibrator.Domain.Model.Setpoint.Setpoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Setpoints");
+                });
+
             modelBuilder.Entity("Calibrator.Domain.Model.Report.AverageSample", b =>
                 {
+                    b.HasOne("Calibrator.Domain.Model.Report.SensorChannel", "Channel")
+                        .WithMany("AverageSamples")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("Calibrator.Domain.Model.Report.Coefficients", b =>
+                {
                     b.HasOne("Calibrator.Domain.Model.Report.SensorChannel", null)
-                        .WithMany("AvgSamples")
-                        .HasForeignKey("SensorChannelId");
+                        .WithOne("Coefficients")
+                        .HasForeignKey("Calibrator.Domain.Model.Report.Coefficients", "SensorChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Calibrator.Domain.Model.Report.ExternalImpact", b =>
                 {
-                    b.HasOne("Calibrator.Domain.Model.Report.Sample", null)
+                    b.HasOne("Calibrator.Domain.Model.Report.Sample", "Sample")
                         .WithMany("ExternalImpacts")
-                        .HasForeignKey("SampleId");
+                        .HasForeignKey("SampleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sample");
                 });
 
             modelBuilder.Entity("Calibrator.Domain.Model.Report.Sample", b =>
                 {
-                    b.HasOne("Calibrator.Domain.Model.Report.SensorChannel", null)
+                    b.HasOne("Calibrator.Domain.Model.Report.SensorChannel", "Channel")
                         .WithMany("Samples")
-                        .HasForeignKey("SensorChannelId");
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
                 });
 
             modelBuilder.Entity("Calibrator.Domain.Model.Report.Sensor", b =>
                 {
-                    b.HasOne("Calibrator.Domain.Model.Report.Report", null)
+                    b.HasOne("Calibrator.Domain.Model.Report.Report", "Report")
                         .WithMany("Sensors")
-                        .HasForeignKey("ReportId");
+                        .HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Report");
                 });
 
             modelBuilder.Entity("Calibrator.Domain.Model.Report.SensorChannel", b =>
                 {
-                    b.HasOne("Calibrator.Domain.Model.Report.Sensor", null)
+                    b.HasOne("Calibrator.Domain.Model.Report.Sensor", "Sensor")
                         .WithMany("Channels")
-                        .HasForeignKey("SensorId");
+                        .HasForeignKey("SensorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sensor");
+                });
+
+            modelBuilder.Entity("Calibrator.Domain.Model.Setpoint.Exposure", b =>
+                {
+                    b.HasOne("Calibrator.Domain.Model.Setpoint.Setpoint", "Setpoint")
+                        .WithMany("Exposures")
+                        .HasForeignKey("SetpointId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Setpoint");
                 });
 
             modelBuilder.Entity("Calibrator.Domain.Model.Report.Report", b =>
@@ -226,9 +344,17 @@ namespace Calibrator.Infrastructure.Migrations
 
             modelBuilder.Entity("Calibrator.Domain.Model.Report.SensorChannel", b =>
                 {
-                    b.Navigation("AvgSamples");
+                    b.Navigation("AverageSamples");
+
+                    b.Navigation("Coefficients")
+                        .IsRequired();
 
                     b.Navigation("Samples");
+                });
+
+            modelBuilder.Entity("Calibrator.Domain.Model.Setpoint.Setpoint", b =>
+                {
+                    b.Navigation("Exposures");
                 });
 #pragma warning restore 612, 618
         }

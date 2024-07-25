@@ -12,5 +12,5 @@ public class Exposure
     public double Duration { get; set; }
 
     [JsonIgnore]
-    public Setpoint Setpoint { get; set; }
+    public Setpoint Setpoint { internal get; set; }
 }
