@@ -75,7 +75,14 @@ namespace Calibrator.API.Controllers
         [HttpGet("{userId}/status")]
         public IActionResult GetCurrentStatus(Guid userId)
         {
-            return Ok(_container.GetManagerById(userId).Status);
+            return Ok(_container.GetManagerById(userId).Status.ToString());
+        }
+
+        [HttpDelete("{reportId}")]
+        public async Task<IActionResult> DeleteReport(Guid reportId)
+        {
+            await _reportRepo.DeleteAsync(reportId);
+            return Ok();
         }
 
         public class StartCalibrationRequestModel
