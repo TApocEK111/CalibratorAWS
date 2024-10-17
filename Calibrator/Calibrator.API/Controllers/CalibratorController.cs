@@ -45,6 +45,7 @@ namespace Calibrator.API.Controllers
             manager.ResultReport = report;
             var setpoint = await _setRepo.GetByIdAsync(startCalibrationRequestModel.setpointId);
             manager.SetSetpoint(setpoint);
+            report.Operator = startCalibrationRequestModel.userInfo.Name;
             report.SetpointId = setpoint.Id;
             manager.CalibrationTask = manager.CalibrationAsync();
 
