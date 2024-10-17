@@ -17,8 +17,8 @@ public class ExperimentManager
     public string ActuatorId { get; set; }
     public string SensorId { get; set; }
     private HttpClient _httpClient = new HttpClient();
-    private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
-    private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
+    private readonly string _actuatorsUri = "https://localhost:7272/api/actuators/";
+    private readonly string _sensorsUri = "http://localhost:7000/api/sensors/";
     public Report ResultReport { get; set; }
     private Exposure _previous { get; set; } = new Exposure() { Value = 0 };
     public Task CalibrationTask { get; set; }

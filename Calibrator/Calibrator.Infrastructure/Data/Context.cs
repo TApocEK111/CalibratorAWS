@@ -9,6 +9,7 @@ public class Context : DbContext
     public Context(DbContextOptions<Context> options)
         : base(options)
     {
+        Database.EnsureCreated();
     }
 
     public DbSet<Report> Reports { get; set; }
@@ -28,6 +29,7 @@ public class Context : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=ReportDB;Username=postgres;Password=admin");
+        //optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=ReportDB;Username=postgres;Password=admin");
+        optionsBuilder.UseSqlite("Data Source=Bebra.db");
     }
 }
