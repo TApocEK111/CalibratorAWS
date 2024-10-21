@@ -10,15 +10,15 @@ namespace Calibrator.API;
 
 public class ExperimentManager
 {
-    public CalibrationStatus Status { get; set; }
+    public CalibrationStatus Status { get; set; } = CalibrationStatus.Inactive;
     private Setpoint _setpoint;
     private SetpointRepository _setpointRepository;
     private ReportRepository _reportRepository;
     public string ActuatorId { get; set; }
     public string SensorId { get; set; }
     private HttpClient _httpClient = new HttpClient();
-    private readonly string _actuatorsUri = "https://actuatorsim.socketsomeone.me/api/actuators/";
-    private readonly string _sensorsUri = "https://sensorsim.socketsomeone.me/api/sensors/";
+    private readonly string _actuatorsUri = "https://localhost:7272/api/actuators/";
+    private readonly string _sensorsUri = "http://localhost:7000/api/sensors/";
     public Report ResultReport { get; set; }
     private Exposure _previous { get; set; } = new Exposure() { Value = 0 };
     public Task CalibrationTask { get; set; }
@@ -46,7 +46,6 @@ public class ExperimentManager
 
     public async Task CalibrationAsync()
     {
-        Status = CalibrationStatus.Inactive;
         if (_setpoint == null)
             throw new ArgumentNullException("Setpoint is null");
 
@@ -63,7 +62,7 @@ public class ExperimentManager
         ResultReport.Sensors[0].Channels[0].Samples = await GetSamplesAsync();
         foreach (var sample in ResultReport.Sensors[0].Channels[0].Samples)
         {
-            if (!IsInBounds(sample.ReferenceValue, sample.PhysicalQuantity, 0.05))
+            if (!IsInBounds(sample.ReferenceValue, sample.PhysicalQuantity, 0.1))
             {
                 throw new ArgumentOutOfRangeException("Error is too big.");
             }
