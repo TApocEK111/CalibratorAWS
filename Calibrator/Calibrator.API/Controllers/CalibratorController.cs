@@ -66,6 +66,13 @@ namespace Calibrator.API.Controllers
             return setpoint;
         }
 
+        [HttpGet("/setpoint/all")]
+        public async Task<ActionResult<Setpoint>> GetAllSetpoints()
+        {
+            var setpoint = await _setRepo.GetAllAsync();
+            return Json(setpoint);
+        }
+
         [HttpGet("{reportId}")]
         public async Task<IActionResult> GetReport(Guid reportId)
         {
