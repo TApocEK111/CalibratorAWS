@@ -20,7 +20,7 @@ public class LSMTests
             channel.Samples.Add(new Sample() { ReferenceValue = args[i], Parameter = args[i + 1] });
         }
 
-        var coefficients = LeastSquareMethod.GetCoeffitients(channel);
+        var coefficients = Approximator.GetCoeffitients(channel);
 
 
         for (int i = 0; i < coefficients.Length; i++)

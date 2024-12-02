@@ -1,6 +1,6 @@
 ﻿namespace Calibrator.Domain.Model.Calibrator;
 
-public static class LeastSquareMethod
+public static class Approximator
 {
     private static double GetDeterminant(double[][] matrix)
     {

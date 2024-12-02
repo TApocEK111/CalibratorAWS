@@ -5,8 +5,8 @@ using Calibrator.Infrastructure.Repository;
 
 namespace Calibrator.API.Controllers
 {
-    [Route("api/[controller]/[action]")]
     [ApiController]
+    [Route("api/calibrator")]
     public class CalibratorController : Controller
     {
         private ManagersContainer _container;
@@ -20,7 +20,7 @@ namespace Calibrator.API.Controllers
             _reportRepo = reportRepo;
         }
 
-        [HttpPost]
+        [HttpPost("calibration")]
         public async Task<IActionResult> Calibration([FromBody] StartCalibrationRequestModel startCalibrationRequestModel)
         {
             var report = new Report();
@@ -52,21 +52,21 @@ namespace Calibrator.API.Controllers
             return Ok(report.Id);
         }
 
-        [HttpPost]
+        [HttpPost("setpoint/set")]
         public async Task<ActionResult<Setpoint>> SetSetpoint(Setpoint setpoint)
         {
             await _setRepo.AddAsync(setpoint);
             return Ok();
         }
 
-        [HttpGet("{setpointId}/setpoint")]
+        [HttpGet("setpoint/{setpointId}")]
         public async Task<ActionResult<Setpoint>> GetSetpoint(Guid setpointId)
         {
             var setpoint = await _setRepo.GetByIdAsync(setpointId);
             return setpoint;
         }
 
-        [HttpGet("/setpoint/all")]
+        [HttpGet("setpoint/all")]
         public async Task<ActionResult<Setpoint>> GetAllSetpoints()
         {
             var setpoint = await _setRepo.GetAllAsync();

@@ -6,7 +6,8 @@ public class Calibrator
 {
     private void ApproximateCoefficients(SensorChannel channel)
     {
-        var coef = LeastSquareMethod.GetCoeffitients(channel);
+
+        var coef = Approximator.GetCoeffitients(channel);
         channel.Coefficients = new Coefficients() { A = coef[0], B = coef[1], C = coef[2] };
     }
     
