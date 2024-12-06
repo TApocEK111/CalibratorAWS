@@ -193,7 +193,7 @@ public class ExperimentManager
 
     public class PostSensorConfigDTO
     {
-        public double[] staticFunctionCoefficients { get; set; } = [5, 2, 0.05, 0.002];
+        public double[] staticFunctionCoefficients { get; set; } = [5, 2];
         public double[] approximateCoefficients { get; set; }
     }
 
