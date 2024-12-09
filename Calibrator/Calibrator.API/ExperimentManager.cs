@@ -19,6 +19,7 @@ public class ExperimentManager
     private HttpClient _httpClient = new HttpClient();
     private readonly string _actuatorsUri = "https://localhost:7272/api/actuators/";
     private readonly string _sensorsUri = "http://localhost:7000/api/sensors/";
+    private bool isFirst = true;
     public Report ResultReport { get; set; }
     private Exposure _previous { get; set; } = new Exposure() { Value = 0 };
     public Task CalibrationTask { get; set; }
@@ -110,6 +111,11 @@ public class ExperimentManager
     public async Task<ActuatorDTO> PostExposureAsync(Exposure exposure)
     {
         var payload = new PostExposureDTO();
+        if (isFirst)
+        {
+            _previous.Value = (await GetCurrentActuatorAsync()).current.value;
+            isFirst = false;
+        }
         payload.currentQuantity.value = _previous.Value;
         payload.targetQuantity.value = exposure.Value;
         payload.exposures.Add(new ExposureDTO { value = exposure.Value, duration = exposure.Duration, speed = exposure.Speed });
